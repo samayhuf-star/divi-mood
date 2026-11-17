@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Divi Mood",
+    "slug": "wifey-mood",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.samay.wifeymood",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.samay.wifeymood",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "scheme": "wifeymood",
+    "plugins": [
+      "expo-audio",
+      "expo-notifications",
+      "expo-sharing",
+      "expo-asset"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "f984a355-a377-4d44-a4de-907bfd9513e3"
+      }
+    },
+    "owner": "krosz"
+  }
+}

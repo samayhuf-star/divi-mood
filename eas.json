@@ -1,0 +1,28 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote",
+    "promptToConfigurePushNotifications": false
+  },
+  "build": {
+    "production": {
+      "autoIncrement": true,
+      "ios": {
+        "image": "latest"
+      },
+      "env": {
+        "EXPO_PUBLIC_RC_IOS_KEY": "appl_ZPLdpxrzPVQYPviSOXXAvBLeXNw"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6835859517",
+        "ascApiKeyPath": "/home/claude/secrets/AuthKey_K6V96Z7RY3.p8",
+        "ascApiKeyIssuerId": "c0c1fcaf-fffc-4623-ab2f-5e2c41779bf5",
+        "ascApiKeyId": "K6V96Z7RY3"
+      }
+    }
+  }
+}
