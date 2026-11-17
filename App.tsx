@@ -23,10 +23,11 @@ const TABS: { id: Tab; icon: string; label: string }[] = [
 ];
 
 function Root() {
-  const { ready, onboarded, profiles, addProfile, activeId } = useStore();
+  const { ready, onboarded, profiles, addProfile, restartProfile, activeId, name: activeName, mode: activeMode } = useStore();
   const [alertsOn] = useAlertSetting();
   const [splash, setSplash] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [restarting, setRestarting] = useState(false);
   const [slots, setSlots] = useState(Platform.OS === 'web' ? 99 : 1);
   const [tab, setTab] = useState<Tab>('home');
   // On web there is no RevenueCat: the preview shows all features unlocked.
@@ -64,6 +65,18 @@ function Root() {
   if (!ready) return <View style={s.center}><ActivityIndicator color={C.pink} /></View>;
   if (!onboarded) return <Onboarding onDone={(wantsPremium) => { if (wantsPremium) unlock(); }} />;
 
+  if (restarting) {
+    return (
+      <SafeAreaView style={s.safe}>
+        <View style={{ flex: 1, paddingHorizontal: 22, paddingBottom: 16 }}>
+          <Pressable onPress={() => setRestarting(false)} style={{ paddingVertical: 10 }}><Text style={{ color: C.pink, fontWeight: '800', fontSize: 16 }}>‹ Cancel</Text></Pressable>
+          <Text style={{ fontSize: 28, fontWeight: '900', color: C.ink, textAlign: 'center' }}>Start over</Text>
+          <PersonForm key={activeId} mode={activeMode} initialName={activeName} submitLabel="Start over" onSubmit={(p) => { restartProfile(activeId, p); setRestarting(false); setTab('home'); }} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   if (adding) {
     return (
       <SafeAreaView style={s.safe}>
@@ -86,7 +99,7 @@ function Root() {
       <View style={{ flex: 1 }}>
         {tab === 'home' && <Home premium={premium} onUnlock={unlock} onAddPerson={addPerson} />}
         {tab === 'insights' && <Insights premium={premium} onUnlock={unlock} />}
-        {tab === 'settings' && <Settings premium={premium} onUnlock={unlock} onRestore={restore} />}
+        {tab === 'settings' && <Settings premium={premium} onUnlock={unlock} onRestore={restore} onRestart={() => setRestarting(true)} />}
       </View>
       <View style={s.tabs}>
         {TABS.map((t) => (

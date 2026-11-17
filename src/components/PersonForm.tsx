@@ -28,9 +28,9 @@ const NAMES: Record<Mode, string[]> = {
 };
 
 /** Name the penguin + the 4 cycle questions. Used by onboarding and by "Add person". */
-export default function PersonForm({ mode, submitLabel, onSubmit }: { mode: Mode; submitLabel: string; onSubmit: (p: NewPerson) => void }) {
+export default function PersonForm({ mode, submitLabel, onSubmit, initialName }: { mode: Mode; submitLabel: string; onSubmit: (p: NewPerson) => void; initialName?: string }) {
   const partner = mode === 'partner';
-  const [name, setName] = useState(NAMES[mode][0]);
+  const [name, setName] = useState(initialName ?? NAMES[mode][0]);
   const [cycle, setCycle] = useState(28);
   const [period, setPeriod] = useState(5);
   const [lastDate, setLastDate] = useState<DateStr>(() => addDays(todayStr(), -10));

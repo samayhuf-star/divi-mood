@@ -53,6 +53,7 @@ interface Ctx {
   switchProfile: (id: string) => void;
   addProfile: (p: NewPerson) => void;
   removeProfile: (id: string) => void;
+  restartProfile: (id: string, p: NewPerson) => void;
   renameProfile: (id: string, name: string) => void;
   finishOnboarding: (p: NewPerson) => void;
   acceptDisclaimer: () => void;
@@ -157,6 +158,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const profiles = d.profiles.filter((p) => p.id !== id);
         return { ...d, profiles, activeId: d.activeId === id ? profiles[0].id : d.activeId };
       }),
+      restartProfile: (id, np) => update((d) => ({
+        ...d,
+        profiles: d.profiles.map((p) => (p.id === id ? { ...makeProfile({ ...np, mode: p.mode }), id: p.id } : p)),
+      })),
       renameProfile: (id, name) => update((d) => ({ ...d, profiles: d.profiles.map((p) => (p.id === id ? { ...p, name: name.trim() || p.name } : p)) })),
       finishOnboarding: (np) => update((d) => { const pr = makeProfile(np); return { ...d, onboarded: true, profiles: [pr], activeId: pr.id }; }),
       acceptDisclaimer: () => update((d) => ({ ...d, disclaimerAccepted: true })),

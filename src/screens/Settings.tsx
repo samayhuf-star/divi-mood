@@ -6,7 +6,7 @@ import { useSoundSetting } from '../sound';
 import { useAlertSetting } from '../notifications';
 import { openCustomerCenter } from '../purchases';
 
-export default function Settings({ premium, onUnlock, onRestore }: { premium: boolean; onUnlock: () => void; onRestore: () => void }) {
+export default function Settings({ premium, onUnlock, onRestore, onRestart }: { premium: boolean; onUnlock: () => void; onRestore: () => void; onRestart: () => void }) {
   const { settings, setSettings, wipe, profiles, activeId, removeProfile, name } = useStore();
   const [confirm, setConfirm] = useState(false);
   const [soundOn, setSoundOn] = useSoundSetting();
@@ -50,6 +50,10 @@ export default function Settings({ premium, onUnlock, onRestore }: { premium: bo
         <Step label="Typical cycle length" v={settings.cycleLength} min={21} max={45} k="cycleLength" />
         <Step label="Typical period length" v={settings.periodLength} min={2} max={10} k="periodLength" />
         <Text style={s.small}>Once you log real periods, Divi Mood uses your own average instead.</Text>
+        <Pressable onPress={onRestart} accessibilityLabel="Start over with a new date" style={s.restart}>
+          <Text style={s.restartTxt}>🔄 Start over with a new date</Text>
+        </Pressable>
+        <Text style={s.small}>Pick a different last period date and cycle for {name}. This clears {name}'s logged dates and moods.</Text>
       </View>
 
       <View style={s.card}>
@@ -102,6 +106,8 @@ export default function Settings({ premium, onUnlock, onRestore }: { premium: bo
 }
 
 const s = StyleSheet.create({
+  restart: { marginTop: 10, borderRadius: 14, borderWidth: 2, borderColor: C.pink, paddingVertical: 10, alignItems: 'center' },
+  restartTxt: { color: C.pink, fontWeight: '800', fontSize: 15 },
   h: { fontSize: 28, fontWeight: '900', color: C.ink, marginBottom: 8 },
   card: { backgroundColor: C.card, borderRadius: 22, padding: 16, marginBottom: 12 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
