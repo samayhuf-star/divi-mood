@@ -1,12 +1,12 @@
 # Divi Mood pricing
 
-Decided by Samay (17 Nov 2026), so no competitor re-pricing was done; first-build price points below.
+Decided by Samay (17 Nov 2026; updated later the same day to $2.99 / $4.99 / $29.99, all with a 7-day free trial), so no competitor re-pricing was done; first-build price points below.
 
 | Plan | Price | Trial | RevenueCat package |
 |---|---|---|---|
-| Weekly | $1.99 | none | `$rc_weekly` |
-| Monthly | $2.99 | none | `$rc_monthly` |
-| Yearly | $19.99 | 7 days | `$rc_annual` |
+| Weekly | $2.99 | 7 days | `$rc_weekly` |
+| Monthly | $4.99 | 7 days | `$rc_monthly` |
+| Yearly | $29.99 | 7 days | `$rc_annual` |
 
 Entitlement: `premium` (risk meter, 7-day forecast). Free: first person, calendar, flow and mood log, Divi, full history.
 
