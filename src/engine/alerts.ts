@@ -40,3 +40,32 @@ export function planMoodAlerts(people: AlertPerson[], from: DateStr = todayStr()
   out.sort((a, b) => a.date.localeCompare(b.date));
   return out.slice(0, cap); // iOS keeps at most 64 pending local notifications
 }
+
+/**
+ * Evening heads-up (19:00) the day BEFORE a person's mood is expected to drop to Danger Ahead or
+ * Bring Chocolate Now, so there is time to prepare. Pure; the phone only schedules the result.
+ */
+export function planHeadsUps(people: AlertPerson[], from: DateStr = todayStr(), days = 45): MoodAlert[] {
+  const out: MoodAlert[] = [];
+  for (const p of people) {
+    if (p.starts.length === 0) continue;
+    let prev: MoodLevel | null = null;
+    for (let i = 0; i <= days; i++) {
+      const d = addDays(from, i);
+      const info = cycleInfoFor(d, p.starts, p.settings);
+      if (!info) continue;
+      const level = expectedMood(info.phase);
+      if (i > 0 && prev !== null && level !== prev && level <= 2) {
+        const who = p.mode === 'self' ? 'You may be' : `${p.name} may be`;
+        const choc = p.mode === 'self' ? 'Treat yourself and rest up.' : 'Chocolate and a kind word go a long way.';
+        out.push({
+          date: addDays(d, -1), name: p.name, level,
+          title: 'Divi heads-up \u{1F36B}',
+          body: `Tomorrow ${who.toLowerCase().startsWith('you') ? 'you' : p.name} could be ${moodName(level)}. ${choc}`,
+        });
+      }
+      prev = level;
+    }
+  }
+  return out.filter((a) => a.date > from).sort((a, b) => a.date.localeCompare(b.date));
+}

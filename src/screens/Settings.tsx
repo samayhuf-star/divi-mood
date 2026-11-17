@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
-import { Alert, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, Share, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { C } from '../theme';
 import { useStore } from '../store';
 import { useSoundSetting } from '../sound';
 import { useAlertSetting } from '../notifications';
+import { makeCode } from '../shareCode';
+import { startsFromFlows } from '../store';
 import { openCustomerCenter } from '../purchases';
 
 export default function Settings({ premium, onUnlock, onRestore, onRestart }: { premium: boolean; onUnlock: () => void; onRestore: () => void; onRestart: () => void }) {
-  const { settings, setSettings, wipe, profiles, activeId, removeProfile, name } = useStore();
+  const { settings, setSettings, wipe, profiles, activeId, removeProfile, name, flows } = useStore();
   const [confirm, setConfirm] = useState(false);
   const [soundOn, setSoundOn] = useSoundSetting();
   const [alertsOn, setAlertsOn] = useAlertSetting();
+
+  const shareCycle = () => {
+    const starts = startsFromFlows(flows);
+    const last = starts[starts.length - 1];
+    if (!last) { Alert.alert('Nothing to share yet', 'Log a period first.'); return; }
+    const code = makeCode({ name, lastPeriod: last, cycleLength: settings.cycleLength, periodLength: settings.periodLength });
+    Share.share({ message: `Follow my mood with Divi Mood 🐧. In the app tap Add a person, then paste this code:\n${code}` }).catch(() => {});
+  };
 
   const del = () => {
     if (Platform.OS === 'web') { setConfirm(true); return; }
@@ -54,6 +64,14 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
           <Text style={s.restartTxt}>🔄 Start over with a new date</Text>
         </Pressable>
         <Text style={s.small}>Pick a different last period date and cycle for {name}. This clears {name}'s logged dates and moods.</Text>
+      </View>
+
+      <View style={s.card}>
+        <Text style={s.title}>Share with your partner</Text>
+        <Pressable onPress={shareCycle} accessibilityLabel="Share my cycle code" style={s.restart}>
+          <Text style={s.restartTxt}>💌 Send {name}'s code</Text>
+        </Pressable>
+        <Text style={s.small}>Sends a short code with the last period date and cycle length only, using the share sheet you choose. Nothing is uploaded; they paste it under Add a person.</Text>
       </View>
 
       <View style={s.card}>

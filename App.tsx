@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StoreProvider, useStore } from './src/store';
@@ -12,6 +12,8 @@ import PersonForm from './src/components/PersonForm';
 import LaunchSplash from './src/components/LaunchSplash';
 import { syncMoodAlerts, useAlertSetting } from './src/notifications';
 import { cycleInfoFor, expectedMood, todayStr, type MoodLevel } from './src/engine/cycle';
+import { parseCode } from './src/shareCode';
+import { syncWidget } from './src/widgetSync';
 import { startsFromFlows } from './src/store';
 import { getSlots, initPurchases, isPremium, onEntitlementChange, restorePurchases, setPurchaseAttributes, showPaywall } from './src/purchases';
 
@@ -28,6 +30,7 @@ function Root() {
   const [splash, setSplash] = useState(true);
   const [adding, setAdding] = useState(false);
   const [restarting, setRestarting] = useState(false);
+  const [code, setCode] = useState('');
   const [slots, setSlots] = useState(Platform.OS === 'web' ? 99 : 1);
   const [tab, setTab] = useState<Tab>('home');
   // On web there is no RevenueCat: the preview shows all features unlocked.
@@ -51,6 +54,12 @@ function Root() {
       true,
     );
   }, [ready, onboarded, profiles, alertsOn]);
+
+  useEffect(() => {
+    if (!ready || !onboarded) return;
+    const a = profiles.find((p) => p.id === activeId) ?? profiles[0];
+    if (a) syncWidget({ name: a.name, mode: a.mode, starts: startsFromFlows(a.flows), settings: a.settings });
+  }, [ready, onboarded, profiles, activeId]);
 
   const unlock = async () => { if (await showPaywall()) { setPremium(true); setSlots(await getSlots()); } };
   // Extra people are paid tiers: at the limit, show RevenueCat's paywall instead of the form.
@@ -83,6 +92,12 @@ function Root() {
         <View style={{ flex: 1, paddingHorizontal: 22, paddingBottom: 16 }}>
           <Pressable onPress={() => setAdding(false)} style={{ paddingVertical: 10 }}><Text style={{ color: C.pink, fontWeight: '800', fontSize: 16 }}>‹ Cancel</Text></Pressable>
           <Text style={{ fontSize: 28, fontWeight: '900', color: C.ink, textAlign: 'center' }}>Add a person</Text>
+          <TextInput value={code} onChangeText={setCode} placeholder="Have a Divi code? Paste it here" autoCapitalize="none" autoCorrect={false} style={{ backgroundColor: '#fff', borderRadius: 14, padding: 12, marginTop: 8, color: C.ink }} />
+          {parseCode(code) && (
+            <Pressable onPress={() => { const np = parseCode(code); if (np) { addProfile(np); setCode(''); setAdding(false); setTab('home'); } }} style={{ backgroundColor: C.pink, borderRadius: 24, paddingVertical: 13, alignItems: 'center', marginTop: 8 }}>
+              <Text style={{ color: '#fff', fontWeight: '800', fontSize: 16 }}>Add {parseCode(code)?.name} from code</Text>
+            </Pressable>
+          )}
           <PersonForm mode="partner" submitLabel="Add and meet their penguin" onSubmit={(p) => { addProfile(p); setAdding(false); setTab('home'); }} />
         </View>
       </SafeAreaView>

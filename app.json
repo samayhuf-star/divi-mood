@@ -38,7 +38,25 @@
       "expo-audio",
       "expo-notifications",
       "expo-sharing",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "MoodWidget",
+              "displayName": "Divi Mood",
+              "description": "Today's mood from Divi",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     ],
     "extra": {
       "eas": {

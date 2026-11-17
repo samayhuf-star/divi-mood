@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-import { planMoodAlerts, type AlertPerson } from './engine/alerts';
+import { planHeadsUps, planMoodAlerts, type AlertPerson } from './engine/alerts';
 import { parse } from './engine/cycle';
 
 const KEY = 'wifeymood.alerts';
@@ -41,9 +41,13 @@ export async function syncMoodAlerts(people: AlertPerson[], on: boolean, ask = f
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
     if (!on || !(await allowed(ask))) return;
-    for (const a of planMoodAlerts(people)) {
+    const all = [
+      ...planMoodAlerts(people).map((a) => ({ a, hour: 8 })),
+      ...planHeadsUps(people).map((a) => ({ a, hour: 19 })),
+    ].sort((x, y) => (x.a.date + x.hour).localeCompare(y.a.date + y.hour)).slice(0, 60);
+    for (const { a, hour } of all) {
       const d = parse(a.date);
-      d.setHours(8, 0, 0, 0);
+      d.setHours(hour, 0, 0, 0);
       if (d.getTime() <= Date.now()) continue;
       await Notifications.scheduleNotificationAsync({
         content: { title: a.title, body: a.body, sound: true },

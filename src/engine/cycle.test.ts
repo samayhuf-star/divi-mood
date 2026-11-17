@@ -93,7 +93,7 @@ describe('expectedMood', () => {
   it('maps every phase to a valid level', () => {
     for (const p of ['period', 'follicular', 'fertile', 'ovulation', 'luteal', 'pms'] as const) {
       expect(expectedMood(p)).toBeGreaterThanOrEqual(1);
-      expect(expectedMood(p)).toBeLessThanOrEqual(5);
+      expect(expectedMood(p)).toBeLessThanOrEqual(6);
     }
   });
 });

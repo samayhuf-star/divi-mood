@@ -11,6 +11,13 @@ const Btn = ({ label, onPress, ghost }: { label: string; onPress: () => void; gh
   </Pressable>
 );
 
+const SLIDES: { level: 1 | 2 | 3 | 4 | 5 | 6; title: string; body: string; size?: number }[] = [
+  { level: 5, title: 'Meet Divi', body: 'A cute penguin that shows how her mood is today, so you know what to expect before you walk in the door.' },
+  { level: 6, title: 'Six moods, one penguin', body: 'From Feeling Spicy to Bring Chocolate Now. Divi dances, wiggles and changes face with every mood.' },
+  { level: 1, title: 'Never get caught off guard', body: 'Get a friendly heads-up the evening before a tough day, and a 7-day mood forecast with simple tips.' },
+  { level: 4, title: 'Share it, privately', body: 'Send a fun Divi mood card to friends. Your data stays on your phone: no account, no server.' },
+];
+
 export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean) => void }) {
   const { finishOnboarding, acceptDisclaimer } = useStore();
   const [step, setStep] = useState(0);
@@ -24,21 +31,26 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
     onDone(premium);
   };
 
-  // Step 0: intro. Step 1: who is this for. Step 2: name + cycle questions. Step 3: what you get.
-  if (step === 0) {
+  // Steps 0-3: intro slides. Step 4: who is this for. Step 5: name + cycle questions. Step 6: what you get.
+  if (step < SLIDES.length) {
+    const sl = SLIDES[step];
     return (
       <View style={s.page}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Penguin level={5} size={280} />
-          <Text style={s.h1}>Meet Divi</Text>
-          <Text style={s.body}>A cute penguin that shows how her mood is today, so you know what to expect before you walk in the door.</Text>
+          <Penguin level={sl.level} size={sl.size ?? 260} />
+          <Text style={s.h1}>{sl.title}</Text>
+          <Text style={s.body}>{sl.body}</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+            {SLIDES.map((_, i) => <View key={i} style={[s.dot, i === step && s.dotOn]} />)}
+          </View>
         </View>
-        <Btn label="Continue" onPress={() => setStep(1)} />
+        <Btn label="Continue" onPress={() => setStep(step + 1)} />
+        {step > 0 && <Btn label="Back" ghost onPress={() => setStep(step - 1)} />}
       </View>
     );
   }
 
-  if (step === 1) {
+  if (step === SLIDES.length) {
     return (
       <View style={s.page}>
         <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -53,17 +65,17 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
             <Text style={s.bigSub}>Answer a few questions about her cycle. Her penguin shows her likely mood each day.</Text>
           </Pressable>
         </View>
-        <Btn label="Continue" onPress={() => setStep(2)} />
+        <Btn label="Continue" onPress={() => setStep(SLIDES.length + 1)} />
       </View>
     );
   }
 
-  if (step === 2) {
+  if (step === SLIDES.length + 1) {
     return (
       <View style={s.page}>
         <Text style={s.h1}>{mode === 'partner' ? 'A few quick questions' : 'Set up your cycle'}</Text>
         <Text style={[s.body, { marginBottom: 0 }]}>Rough answers are fine. The penguin gets smarter as you log real moods.</Text>
-        <PersonForm key={mode} mode={mode} submitLabel="Continue" onSubmit={(p) => { setPerson(p); setStep(3); }} />
+        <PersonForm key={mode} mode={mode} submitLabel="Continue" onSubmit={(p) => { setPerson(p); setStep(SLIDES.length + 2); }} />
       </View>
     );
   }
@@ -114,6 +126,8 @@ const s = StyleSheet.create({
   btn: { backgroundColor: C.pink, borderRadius: 28, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   ghost: { backgroundColor: 'transparent' },
   btnTxt: { color: '#fff', fontSize: 17, fontWeight: '800' },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.line },
+  dotOn: { backgroundColor: C.pink, width: 22 },
   card: { backgroundColor: C.card, borderRadius: 22, padding: 16, marginTop: 10 },
   big: { backgroundColor: '#fff', borderRadius: 22, padding: 18, marginTop: 12, borderWidth: 3, borderColor: 'transparent' },
   bigOn: { borderColor: C.pink },

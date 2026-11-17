@@ -20,3 +20,13 @@ test('self mode speaks to the user', () => {
   const a = planMoodAlerts([{ ...p, mode: 'self' }], '2026-11-17', 45);
   expect(a[0].body.startsWith('You are likely')).toBe(true);
 });
+
+import { planHeadsUps } from './alerts';
+describe('planHeadsUps', () => {
+  it('warns the evening before a drop to low mood, never in the past', () => {
+    const people = [{ name: 'Wifey', mode: 'partner' as const, starts: ['2026-10-01', '2026-10-29'], settings: { cycleLength: 28, periodLength: 5, lutealLength: 14 } }];
+    const out = planHeadsUps(people, '2026-11-01');
+    expect(out.length).toBeGreaterThan(0);
+    out.forEach((a) => { expect(a.date > '2026-11-01').toBe(true); expect(a.level <= 2).toBe(true); });
+  });
+});

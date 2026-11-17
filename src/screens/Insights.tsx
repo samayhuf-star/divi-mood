@@ -11,7 +11,7 @@ export default function Insights({ premium, onUnlock }: { premium: boolean; onUn
   const { periodStarts, moods, settings, mode } = useStore();
   const partner = mode === 'partner';
   const week = Array.from({ length: 7 }, (_, i) => addDays(todayStr(), i));
-  const EMO: Record<number, string> = { 5: '😍', 4: '😊', 3: '😐', 2: '😠', 1: '😢' };
+  const EMO: Record<number, string> = { 6: '😉', 5: '😍', 4: '😊', 3: '😐', 2: '😠', 1: '😢' };
   const today = todayStr();
   const info = cycleInfoFor(today, periodStarts, settings);
   // show the NEXT ovulation / fertile window, not one that already passed this cycle
@@ -20,6 +20,14 @@ export default function Insights({ premium, onUnlock }: { premium: boolean; onUn
   const fsNext = info ? addDays(info.fertileStart, shift) : '';
   const feNext = info ? addDays(info.fertileEnd, shift) : '';
   const risk = pregnancyRisk(today, periodStarts, settings);
+  const logged = Object.keys(moods).sort();
+  let streak = 0;
+  for (let d = moods[today] ? today : addDays(today, -1); moods[d]; d = addDays(d, -1)) streak++;
+  const avg = logged.length ? logged.reduce((a, d) => a + moods[d], 0) / logged.length : 0;
+  const counts: Record<number, number> = {};
+  logged.forEach((d) => { counts[moods[d]] = (counts[moods[d]] || 0) + 1; });
+  const topLvl = Object.keys(counts).sort((a, b) => counts[Number(b)] - counts[Number(a)])[0];
+  const topMood = topLvl ? MOODS.find((x) => x.level === Number(topLvl)) : null;
   const days = Array.from({ length: 14 }, (_, i) => addDays(today, i - 13));
 
   return (
@@ -84,6 +92,20 @@ export default function Insights({ premium, onUnlock }: { premium: boolean; onUn
           {info.uncertain && <Text style={s.note}>Dates are less certain until a few more cycles are logged.</Text>}
         </View>
       )}
+
+      <View style={s.card}>
+        <Text style={s.cardTitle}>Mood insights</Text>
+        {logged.length === 0 ? (
+          <Text style={s.note}>Tap a mood on Home each day. Streaks and patterns show up here.</Text>
+        ) : (
+          <>
+            <Row k="Logging streak" v={`${streak} day${streak === 1 ? '' : 's'} 🔥`} />
+            <Row k="Days logged" v={String(logged.length)} />
+            <Row k="Average mood" v={`${avg.toFixed(1)} / 6`} />
+            {topMood && <Row k="Most common" v={topMood.name} />}
+          </>
+        )}
+      </View>
 
       <View style={s.card}>
         <Text style={s.cardTitle}>Mood, last 14 days</Text>
