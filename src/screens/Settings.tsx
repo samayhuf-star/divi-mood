@@ -7,10 +7,12 @@ import { useAlertSetting } from '../notifications';
 import { makeCode } from '../shareCode';
 import { startsFromFlows } from '../store';
 import { openCustomerCenter } from '../purchases';
+import DoctorSummary from '../components/DoctorSummary';
 
 export default function Settings({ premium, onUnlock, onRestore, onRestart }: { premium: boolean; onUnlock: () => void; onRestore: () => void; onRestart: () => void }) {
   const { settings, setSettings, wipe, profiles, activeId, removeProfile, name, flows } = useStore();
   const [confirm, setConfirm] = useState(false);
+  const [docOpen, setDocOpen] = useState(false);
   const [soundOn, setSoundOn] = useSoundSetting();
   const [alertsOn, setAlertsOn] = useAlertSetting();
 
@@ -65,6 +67,15 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
         </Pressable>
         <Text style={s.small}>Pick a different last period date and cycle for {name}. This clears {name}'s logged dates and moods.</Text>
       </View>
+
+      <View style={s.card}>
+        <Text style={s.title}>Doctor summary</Text>
+        <Pressable onPress={() => setDocOpen(true)} accessibilityLabel="Open doctor summary" style={s.restart}>
+          <Text style={s.restartTxt}>🩺 View cycle summary</Text>
+        </Pressable>
+        <Text style={s.small}>Average cycle, recent periods and any lateness in one note to show or send a doctor. You also get a nudge when a period is more than 2 days late.</Text>
+      </View>
+      <DoctorSummary visible={docOpen} name={name} starts={startsFromFlows(flows)} flows={flows} settings={settings} onClose={() => setDocOpen(false)} />
 
       <View style={s.card}>
         <Text style={s.title}>Share with your partner</Text>

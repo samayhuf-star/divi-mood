@@ -1,4 +1,5 @@
-import { addDays, cycleInfoFor, expectedMood, moodName, PARTNER_TIPS, PHASE_TIPS, todayStr, type CycleSettings, type DateStr, type MoodLevel } from './cycle';
+import { LATE_AFTER } from './late';
+import { addDays, averageCycle, cleanStarts, cycleInfoFor, expectedMood, moodName, PARTNER_TIPS, PHASE_TIPS, todayStr, type CycleSettings, type DateStr, type MoodLevel } from './cycle';
 
 export interface AlertPerson {
   name: string;
@@ -68,6 +69,32 @@ export function planHeadsUps(people: AlertPerson[], from: DateStr = todayStr(), 
     }
   }
   return out.filter((a) => a.date > from).sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/**
+ * Late-period nudges (delivered at 10:00) on the 3rd and 7th day past the expected date, only while no
+ * new period start has been logged. Re-synced on every launch, so logging a period cancels them.
+ */
+export function planLateAlerts(people: AlertPerson[], from: DateStr = todayStr()): MoodAlert[] {
+  const out: MoodAlert[] = [];
+  for (const p of people) {
+    const s = cleanStarts(p.starts);
+    if (s.length === 0) continue;
+    const expected = addDays(s[s.length - 1], averageCycle(s, p.settings.cycleLength));
+    for (const late of [LATE_AFTER + 1, 7]) {
+      const date = addDays(expected, late);
+      if (date < from) continue;
+      const self = p.mode === 'self';
+      out.push({
+        date, name: p.name, level: 3,
+        title: `Divi: ${self ? 'your' : `${p.name}'s`} period is ${late} days late`,
+        body: late < 7
+          ? (self ? 'Stress, travel and sleep can shift a cycle. If you might be pregnant, a test can help. Tap to open your summary.' : `Be gentle. Stress and travel can shift a cycle, and this is only an estimate. Tap to see ${p.name}'s summary.`)
+          : (self ? 'A week late. If you are worried, a doctor can help. Your summary is ready to share.' : `A week past the estimate. If ${p.name} is worried, a doctor can help. A summary is ready to share.`),
+      });
+    }
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /**
