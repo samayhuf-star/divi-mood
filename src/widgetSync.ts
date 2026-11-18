@@ -4,13 +4,12 @@ import { addDays, cycleInfoFor, expectedMood, moodName, PARTNER_TIPS, PHASE_TIPS
 const EMOJI: Record<MoodLevel, string> = { 6: '😉', 5: '😍', 4: '😊', 3: '😐', 2: '😠', 1: '😢' };
 
 /** Gives the home-screen widget one entry per day for the next 14 days (mood expected for the active person). */
-// Widget is parked: its iOS extension needs its own Apple bundle ID + provisioning profile before it can ship.
-const WIDGET_ENABLED = false;
+const WIDGET_ENABLED = true;
 export function syncWidget(p: { name: string; mode: 'self' | 'partner'; starts: DateStr[]; settings: CycleSettings } | undefined): void {
   if (!WIDGET_ENABLED || Platform.OS !== 'ios' || !p || p.starts.length === 0) return;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const MoodWidget = require('./widgets-pending/MoodWidget').default;
+    const MoodWidget = require('./widgets/MoodWidget').default;
     const today = todayStr();
     const entries = [];
     for (let i = 0; i < 14; i++) {
