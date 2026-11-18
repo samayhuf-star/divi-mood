@@ -112,7 +112,7 @@ function Root() {
     <SafeAreaView style={s.safe}>
       {splash && act && <LaunchSplash level={todayLevel} who={act.mode === 'self' ? 'You are' : act.name} onDone={() => setSplash(false)} />}
       <View style={{ flex: 1 }}>
-        {tab === 'home' && <Home premium={premium} onUnlock={unlock} onAddPerson={addPerson} />}
+        {tab === 'home' && <Home premium={premium} onUnlock={unlock} onAddPerson={addPerson} onRestart={() => setRestarting(true)} />}
         {tab === 'insights' && <Insights premium={premium} onUnlock={unlock} />}
         {tab === 'settings' && <Settings premium={premium} onUnlock={unlock} onRestore={restore} onRestart={() => setRestarting(true)} />}
       </View>

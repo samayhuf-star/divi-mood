@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import HistoryCalendar from '../components/HistoryCalendar';
 import Calendar from '../components/Calendar';
 import Penguin from '../components/Penguin';
 import DayInfo from '../components/DayInfo';
@@ -14,11 +15,14 @@ import DoctorSummary from '../components/DoctorSummary';
 import { lateStatus } from '../engine/late';
 
 
-export default function Home({ premium, onUnlock, onAddPerson }: { premium: boolean; onUnlock: () => void; onAddPerson: () => void }) {
+export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { premium: boolean; onUnlock: () => void; onAddPerson: () => void; onRestart: () => void }) {
   const { periodStarts, flows, moods, settings, setFlow, mode, name, profiles, activeId, switchProfile } = useStore();
   const partner = mode === 'partner';
   const [selected, setSelected] = useState(todayStr());
   const [month, setMonth] = useState(todayStr());
+  const [expanded, setExpanded] = useState(true); // calendar open or minimised (minimised = big Divi)
+  const [histOpen, setHistOpen] = useState(false);
+  const [box, setBox] = useState({ w: 0, h: 0 });
 
   const info = cycleInfoFor(selected, periodStarts, settings);
   const risk = pregnancyRisk(selected, periodStarts, settings);
@@ -41,56 +45,68 @@ export default function Home({ premium, onUnlock, onAddPerson }: { premium: bool
     setPulse((n) => n + 1);
   }, [face, activeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Divi fills the space between the caption row and the buttons, so nothing can overlap her
+  const pengSize = Math.max(110, Math.min(box.h - 4, box.w, 420));
+  const nextPerson = () => {
+    const i = profiles.findIndex((p) => p.id === activeId);
+    switchProfile(profiles[(i + 1) % profiles.length].id);
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ShareScreen visible={shareOpen} who={mode === 'self' ? 'You are' : name} level={face} onClose={() => setShareOpen(false)} />
       <MessageIdeas visible={ideasOpen} phase={(todayInfo ?? info)?.phase ?? 'follicular'} partner={partner} onClose={() => setIdeasOpen(false)} />
       <DoctorSummary visible={docOpen} name={name} starts={periodStarts} flows={flows} settings={settings} onClose={() => setDocOpen(false)} />
-      {/* TOP HALF: people, calendar, dates, mood levels */}
-      <View style={s.top}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 6 }}>
-          {profiles.map((p) => (
-            <Pressable key={p.id} onPress={() => switchProfile(p.id)} style={[s.who, p.id === activeId && s.whoOn]} accessibilityLabel={`Switch to ${p.name}`}>
-              <Text style={[s.whoTxt, p.id === activeId && { color: '#fff' }]}>🐧 {p.name}</Text>
+      <HistoryCalendar visible={histOpen} starts={periodStarts} flows={flows} settings={settings} onPick={(d) => { setSelected(d); setMonth(d); setExpanded(true); setHistOpen(false); }} onClose={() => setHistOpen(false)} />
+
+      {expanded ? (
+        <View style={s.top}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 6 }}>
+            {profiles.map((p) => (
+              <Pressable key={p.id} onPress={() => switchProfile(p.id)} style={[s.who, p.id === activeId && s.whoOn]} accessibilityLabel={`Switch to ${p.name}`}>
+                <Text style={[s.whoTxt, p.id === activeId && { color: '#fff' }]}>🐧 {p.name}</Text>
+              </Pressable>
+            ))}
+            <Pressable onPress={onAddPerson} style={s.who} accessibilityLabel="Add person"><Text style={s.whoTxt}>＋ Add person</Text></Pressable>
+          </ScrollView>
+          {late?.late && (
+            <Pressable style={s.late} onPress={() => setDocOpen(true)} accessibilityLabel="Period late, open summary">
+              <Text style={s.lateTxt}>⏰ {partner ? `${name}\u2019s` : 'Your'} period is {late.daysLate} days late · Tap for summary</Text>
             </Pressable>
-          ))}
-          <Pressable onPress={onAddPerson} style={s.who} accessibilityLabel="Add person"><Text style={s.whoTxt}>＋ Add person</Text></Pressable>
-        </ScrollView>
-        {late?.late && (
-          <Pressable style={s.late} onPress={() => setDocOpen(true)} accessibilityLabel="Period late, open summary">
-            <Text style={s.lateTxt}>⏰ {partner ? `${name}\u2019s` : 'Your'} period is {late.daysLate} days late · Tap for summary</Text>
-          </Pressable>
-        )}
-        <Calendar month={month} onMonth={setMonth} selected={selected} onSelect={setSelected} starts={periodStarts} flows={flows} settings={settings} />
-        <DayInfo date={selected} starts={periodStarts} settings={settings} partner={partner} />
-      </View>
-
-      {/* BOTTOM HALF: Divi, whose face follows the mood level */}
-      <View style={s.bottom}>
-        <Text style={s.caption}>{logged ? `${name} · ${moodName(logged)}` : info ? `${name} · likely ${moodName(face)}` : name}</Text>
-
-        {!partner && <Pressable style={s.riskChip} onPress={premium ? undefined : onUnlock} accessibilityLabel="Pregnancy risk">
-          <Text style={s.riskTitle}>Pregnancy risk</Text>
-          {premium && risk ? (
-            <>
-              <RiskMeter risk={risk} compact />
-            </>
-          ) : (
-            <Text style={{ fontSize: 13, color: C.pink, fontWeight: '800', marginTop: 6 }}>🔒 Plus</Text>
           )}
-        </Pressable>}
-
-        <View style={s.btnRow}>
-          <Pressable style={s.shareBtn} onPress={() => setShareOpen(true)} accessibilityLabel="Share mood">
-            <Text style={s.shareTxt}>📤 Share mood</Text>
-          </Pressable>
-          <Pressable style={s.shareBtn} onPress={() => setIdeasOpen(true)} accessibilityLabel="Message ideas">
-            <Text style={s.shareTxt}>💌 Ideas</Text>
-          </Pressable>
+          <Calendar month={month} onMonth={setMonth} selected={selected} onSelect={setSelected} starts={periodStarts} flows={flows} settings={settings} onCollapse={() => setExpanded(false)} />
+          <DayInfo date={selected} starts={periodStarts} settings={settings} partner={partner} />
         </View>
-        <Pressable style={s.pengWrap} onPress={() => { play(face); setPulse((n) => n + 1); }} accessibilityLabel="Tap the penguin">
-          <Penguin level={face} size={248} pulse={pulse} />
-        </Pressable>
+      ) : (
+        <View style={s.mini}>
+          <Pressable style={s.icon} onPress={() => setExpanded(true)} accessibilityLabel="Open calendar"><Text style={s.iconTxt}>📅</Text></Pressable>
+          {profiles.length > 1 && <Pressable style={s.icon} onPress={nextPerson} accessibilityLabel="Switch person"><Text style={s.iconTxt}>👥</Text></Pressable>}
+          <Pressable style={s.icon} onPress={onAddPerson} accessibilityLabel="Add person"><Text style={s.iconTxt}>＋</Text></Pressable>
+          {late?.late && <Pressable style={[s.icon, { backgroundColor: '#FFE3E0' }]} onPress={() => setDocOpen(true)} accessibilityLabel="Period late"><Text style={s.iconTxt}>⏰</Text></Pressable>}
+        </View>
+      )}
+
+      <View style={s.bottom}>
+        <View style={s.capRow}>
+          <Text style={s.caption} numberOfLines={1}>{logged ? `${name} · ${moodName(logged)}` : info ? `${name} · likely ${moodName(face)}` : name}</Text>
+          {!expanded && !partner && (
+            <Pressable onPress={premium ? undefined : onUnlock} style={s.riskPill} accessibilityLabel="Pregnancy risk">
+              <Text style={[s.riskPillTxt, premium && risk && { color: RISK_COLORS[risk.level] }]}>{premium && risk ? `Risk: ${risk.label}` : '🔒 Risk'}</Text>
+            </Pressable>
+          )}
+        </View>
+
+        <View style={s.mid}>
+          <Pressable style={s.pengArea} onLayout={(e) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })} onPress={() => { play(face); setPulse((n) => n + 1); }} accessibilityLabel="Tap the penguin">
+            {box.h > 0 && <Penguin level={face} size={pengSize} pulse={pulse} />}
+          </Pressable>
+          {expanded && !partner && (
+            <Pressable style={s.riskChip} onPress={premium ? undefined : onUnlock} accessibilityLabel="Pregnancy risk">
+              <Text style={s.riskTitle}>Pregnancy risk</Text>
+              {premium && risk ? <RiskMeter risk={risk} compact /> : <Text style={{ fontSize: 13, color: C.pink, fontWeight: '800', marginTop: 6 }}>🔒 Plus</Text>}
+            </Pressable>
+          )}
+        </View>
 
         {partner ? (
           <View style={s.flowBar}>
@@ -101,18 +117,25 @@ export default function Home({ premium, onUnlock, onAddPerson }: { premium: bool
             </Pressable>
           </View>
         ) : (
-        <View style={s.flowBar}>
-          <Text style={s.flowLabel}>Flow</Text>
-          {FLOWS.map((f) => {
-            const on = flows[selected] === f.id;
-            return (
-              <Pressable key={f.id} disabled={isFuture} onPress={() => setFlow(selected, on ? null : f.id)} style={[s.flow, on && { backgroundColor: C.period }]}>
-                <Text style={[s.flowTxt, on && { color: '#fff' }]}>{'💧'.repeat(f.drops)} {f.name}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+          <View style={s.flowBar}>
+            <Text style={s.flowLabel}>Flow</Text>
+            {FLOWS.map((f) => {
+              const on = flows[selected] === f.id;
+              return (
+                <Pressable key={f.id} disabled={isFuture} onPress={() => setFlow(selected, on ? null : f.id)} style={[s.flow, on && { backgroundColor: C.period }]}>
+                  <Text style={[s.flowTxt, on && { color: '#fff' }]}>{'💧'.repeat(f.drops)} {f.name}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
         )}
+
+        <View style={s.actions}>
+          <Pressable style={s.act} onPress={() => setHistOpen(true)} accessibilityLabel="Calendar, past months"><Text style={s.actTxt}>📅 Calendar</Text></Pressable>
+          <Pressable style={s.act} onPress={() => setShareOpen(true)} accessibilityLabel="Share mood"><Text style={s.actTxt}>📤 Share</Text></Pressable>
+          <Pressable style={s.act} onPress={() => setIdeasOpen(true)} accessibilityLabel="Message ideas"><Text style={s.actTxt}>💌 Ideas</Text></Pressable>
+          <Pressable style={[s.act, s.actReset]} onPress={onRestart} accessibilityLabel="Reset and start over"><Text style={[s.actTxt, { color: C.period }]}>🔄 Reset</Text></Pressable>
+        </View>
       </View>
     </View>
   );
@@ -123,23 +146,28 @@ const s = StyleSheet.create({
   whoOn: { backgroundColor: C.pink, borderColor: C.pink },
   whoTxt: { fontSize: 13, fontWeight: '800', color: C.ink },
   top: { paddingHorizontal: 14, paddingTop: 4 },
-  moodRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
-  mood: { width: '15.6%', borderRadius: 16, borderWidth: 2, alignItems: 'center', paddingVertical: 5 },
-  moodTxt: { fontSize: 10, fontWeight: '700', color: C.sub, marginTop: 1 },
-  bottom: { flex: 1, marginTop: 6, backgroundColor: C.pinkSoft, borderTopLeftRadius: 36, borderTopRightRadius: 36, overflow: 'hidden', alignItems: 'center' },
-  pengWrap: { position: 'absolute', bottom: 92, alignSelf: 'center' },
-  btnRow: { position: 'absolute', bottom: 8, alignSelf: 'center', flexDirection: 'row', gap: 8, zIndex: 3 },
+  mini: { flexDirection: 'row', gap: 8, paddingHorizontal: 14, paddingTop: 6, paddingBottom: 2 },
+  icon: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: C.pinkSoft },
+  iconTxt: { fontSize: 17 },
+  bottom: { flex: 1, marginTop: 6, backgroundColor: C.pinkSoft, borderTopLeftRadius: 36, borderTopRightRadius: 36, overflow: 'hidden', paddingTop: 12, paddingBottom: 8 },
+  capRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, gap: 8 },
+  caption: { flex: 1, fontSize: 15, fontWeight: '900', color: C.ink },
+  riskPill: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 4 },
+  riskPillTxt: { fontSize: 12, fontWeight: '900', color: C.sub },
+  mid: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8 },
+  pengArea: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
+  riskChip: { backgroundColor: '#fff', borderRadius: 18, padding: 8, alignItems: 'center', width: 138 },
+  riskTitle: { fontSize: 11, fontWeight: '800', color: C.sub, textTransform: 'uppercase' },
   late: { backgroundColor: '#FFE3E0', borderRadius: 14, paddingVertical: 7, paddingHorizontal: 12, marginBottom: 6 },
   lateTxt: { fontSize: 12, fontWeight: '800', color: '#A3372E' },
-  shareBtn: { backgroundColor: C.pink, paddingHorizontal: 18, paddingVertical: 9, borderRadius: 20 },
-  shareTxt: { color: '#fff', fontWeight: '900', fontSize: 14 },
-  caption: { position: 'absolute', top: 12, left: 16, fontSize: 15, fontWeight: '900', color: C.ink, zIndex: 2 },
-  riskChip: { position: 'absolute', top: 12, right: 14, backgroundColor: '#fff', borderRadius: 18, padding: 8, alignItems: 'center', zIndex: 2, width: 138 },
-  riskTitle: { fontSize: 11, fontWeight: '800', color: C.sub, textTransform: 'uppercase' },
-  flowBar: { position: 'absolute', bottom: 56, left: 10, right: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, zIndex: 3 },
+  flowBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingHorizontal: 10, marginBottom: 8 },
   flowLabel: { fontSize: 11, fontWeight: '800', color: C.ink },
   flow: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 8, paddingVertical: 6 },
   flowTxt: { fontSize: 11, fontWeight: '700', color: C.ink },
+  actions: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingHorizontal: 10 },
+  act: { backgroundColor: C.pink, paddingHorizontal: 11, paddingVertical: 9, borderRadius: 18 },
+  actReset: { backgroundColor: '#fff' },
+  actTxt: { color: '#fff', fontWeight: '900', fontSize: 12 },
 });
 
 export { RISK_COLORS };
