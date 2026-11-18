@@ -34,7 +34,7 @@
     },
     "scheme": "wifeymood",
     "plugins": [
-      "expo-audio",
+      ["expo-audio", { "microphonePermission": false }],
       "expo-notifications",
       "expo-sharing",
       "expo-asset",
