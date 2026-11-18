@@ -111,8 +111,8 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
       <View style={s.card}>
         <Text style={s.title}>Your privacy</Text>
         <Text style={s.small}>All logs are stored only on this phone. No account, no ads, no tracking of your cycle data. Nothing is sold or shared.</Text>
-        <Pressable onPress={() => Linking.openURL('https://media.base44.com/files/public/6af96a57b5faa95de96aa132/80e142f5b_divimood-privacy.txt')} style={{ paddingVertical: 8 }}><Text style={s.link}>Privacy policy</Text></Pressable>
-        <Pressable onPress={() => Linking.openURL('https://media.base44.com/files/public/6af96a57b5faa95de96aa132/d75a2de44_divimood-terms.txt')} style={{ paddingVertical: 8 }}><Text style={s.link}>Terms of use</Text></Pressable>
+        <Pressable onPress={() => Linking.openURL('https://klenzer.online/divi-mood/privacy')} style={{ paddingVertical: 8 }}><Text style={s.link}>Privacy policy</Text></Pressable>
+        <Pressable onPress={() => Linking.openURL('https://klenzer.online/divi-mood/terms')} style={{ paddingVertical: 8 }}><Text style={s.link}>Terms of use</Text></Pressable>
         <Pressable onPress={() => Linking.openURL('mailto:samayhuf@gmail.com')} style={{ paddingVertical: 8 }}><Text style={s.link}>Contact support</Text></Pressable>
         {confirm ? (
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 6 }}>
