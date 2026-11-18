@@ -19,7 +19,7 @@ export default function DayInfo({ date, starts, settings, partner }: { date: Dat
   const ovIn = diffDays(info.ovulationDate, date);
   const fertIn = diffDays(info.fertileStart, date);
   const next = diffDays(info.nextPeriod, date);
-  const tip = lateBy ? (partner ? 'Be gentle, no pressure. Stress and travel can shift a cycle.' : 'Stress, travel and sleep can shift a cycle. Log your period when it starts.') : (partner ? PARTNER_TIPS : PHASE_TIPS)[info.phase]);
+  const tip = lateBy ? (partner ? 'Be gentle, no pressure. Stress and travel can shift a cycle.' : 'Stress, travel and sleep can shift a cycle. Log your period when it starts.') : (partner ? PARTNER_TIPS : PHASE_TIPS)[info.phase];
   return (
     <View style={s.box}>
       <View style={s.head}>
