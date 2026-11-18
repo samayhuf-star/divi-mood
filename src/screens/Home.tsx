@@ -87,7 +87,7 @@ export default function Home({ premium, onUnlock, onAddPerson }: { premium: bool
           <Text style={s.shareTxt}>📤 Share mood</Text>
         </Pressable>
         <Pressable style={s.pengWrap} onPress={() => { play(face); setPulse((n) => n + 1); }} accessibilityLabel="Tap the penguin">
-          <Penguin level={face} size={300} pulse={pulse} />
+          <Penguin level={face} size={270} pulse={pulse} />
         </Pressable>
 
         {partner ? (
@@ -125,13 +125,13 @@ const s = StyleSheet.create({
   mood: { width: '15.6%', borderRadius: 16, borderWidth: 2, alignItems: 'center', paddingVertical: 5 },
   moodTxt: { fontSize: 10, fontWeight: '700', color: C.sub, marginTop: 1 },
   bottom: { flex: 1, marginTop: 6, backgroundColor: C.pinkSoft, borderTopLeftRadius: 36, borderTopRightRadius: 36, overflow: 'hidden', alignItems: 'center' },
-  pengWrap: { position: 'absolute', bottom: 38, alignSelf: 'center' },
-  shareBtn: { position: 'absolute', top: 42, left: 16, backgroundColor: C.pink, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, zIndex: 3 },
+  pengWrap: { position: 'absolute', bottom: 88, alignSelf: 'center' },
+  shareBtn: { position: 'absolute', bottom: 8, alignSelf: 'center', backgroundColor: C.pink, paddingHorizontal: 22, paddingVertical: 9, borderRadius: 20, zIndex: 3 },
   shareTxt: { color: '#fff', fontWeight: '900', fontSize: 14 },
   caption: { position: 'absolute', top: 12, left: 16, fontSize: 15, fontWeight: '900', color: C.ink, zIndex: 2 },
   riskChip: { position: 'absolute', top: 12, right: 14, backgroundColor: '#fff', borderRadius: 18, padding: 8, alignItems: 'center', zIndex: 2, width: 138 },
   riskTitle: { fontSize: 11, fontWeight: '800', color: C.sub, textTransform: 'uppercase' },
-  flowBar: { position: 'absolute', bottom: 8, left: 10, right: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, zIndex: 3 },
+  flowBar: { position: 'absolute', bottom: 56, left: 10, right: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, zIndex: 3 },
   flowLabel: { fontSize: 11, fontWeight: '800', color: C.ink },
   flow: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 8, paddingVertical: 6 },
   flowTxt: { fontSize: 11, fontWeight: '700', color: C.ink },
