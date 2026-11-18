@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { C } from '../theme';
+import { lateStatus } from '../engine/late';
 import { PHASE_TIPS, PARTNER_TIPS, cycleInfoFor, diffDays, parse, todayStr, type CycleSettings, type DateStr, type Phase } from '../engine/cycle';
 
 const PHASE_NAME: Record<Phase, string> = { period: 'Period', follicular: 'Follicular', fertile: 'Fertile window', ovulation: 'Ovulation day', luteal: 'Luteal', pms: 'PMS days' };
@@ -13,20 +14,22 @@ export default function DayInfo({ date, starts, settings, partner }: { date: Dat
   const info = cycleInfoFor(date, starts, settings);
   if (!info) return <View style={s.box}><Text style={s.line}>Log a period start to see predictions.</Text></View>;
   const today = todayStr();
+  const ls = date === today ? lateStatus(today, starts, settings) : null;
+  const lateBy = ls && ls.daysLate > 0 ? ls.daysLate : 0;
   const ovIn = diffDays(info.ovulationDate, date);
   const fertIn = diffDays(info.fertileStart, date);
   const next = diffDays(info.nextPeriod, date);
-  const tip = (partner ? PARTNER_TIPS : PHASE_TIPS)[info.phase];
+  const tip = lateBy ? (partner ? 'Be gentle, no pressure. Stress and travel can shift a cycle.' : 'Stress, travel and sleep can shift a cycle. Log your period when it starts.') : (partner ? PARTNER_TIPS : PHASE_TIPS)[info.phase]);
   return (
     <View style={s.box}>
       <View style={s.head}>
-        <View style={[s.chip, { backgroundColor: PHASE_COLOR[info.phase] }]}>
-          <Text style={[s.chipTxt, info.phase === 'period' && { color: '#fff' }]}>{PHASE_NAME[info.phase]}</Text>
+        <View style={[s.chip, { backgroundColor: lateBy ? '#FFE3E0' : PHASE_COLOR[info.phase] }]}>
+          <Text style={[s.chipTxt, !lateBy && info.phase === 'period' && { color: '#fff' }]}>{lateBy ? 'Period late' : PHASE_NAME[info.phase]}</Text>
         </View>
-        <Text style={s.day}>{date === today ? 'Today' : SHORT(date)} · Day {info.cycleDay} of {info.cycleLength}</Text>
+        <Text style={s.day}>{lateBy ? `Today · ${lateBy} day${lateBy === 1 ? '' : 's'} late` : `${date === today ? 'Today' : SHORT(date)} · Day ${info.cycleDay} of ${info.cycleLength}`}</Text>
       </View>
       <View style={s.cols}>
-        <View style={s.col}><Text style={s.k}>Next period</Text><Text style={s.v}>{SHORT(info.nextPeriod)} · {IN(next)}</Text></View>
+        <View style={s.col}><Text style={s.k}>{lateBy ? 'Was expected' : 'Next period'}</Text><Text style={s.v}>{lateBy && ls ? `${SHORT(ls.expected)} · ${IN(-lateBy)}` : `${SHORT(info.nextPeriod)} · ${IN(next)}`}</Text></View>
         <View style={s.col}>
           <Text style={s.k}>{ovIn >= 0 ? 'Ovulation' : 'Fertile window'}</Text>
           <Text style={s.v}>{ovIn >= 0 ? `${SHORT(info.ovulationDate)} · ${IN(ovIn)}` : `${SHORT(info.fertileStart)} · ${IN(diffDays(info.fertileStart, date))}`}</Text>
