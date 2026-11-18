@@ -25,12 +25,14 @@ export default function DayInfo({ date, starts, settings, partner }: { date: Dat
         </View>
         <Text style={s.day}>{date === today ? 'Today' : SHORT(date)} · Day {info.cycleDay} of {info.cycleLength}</Text>
       </View>
-      <Text style={s.line}>
-        Next period {SHORT(info.nextPeriod)} ({IN(next)})
-        {ovIn >= 0 ? `  ·  Ovulation ${SHORT(info.ovulationDate)} (${IN(ovIn)})` : fertIn > 0 ? `  ·  Fertile ${IN(fertIn)}` : ''}
-      </Text>
-      <Text style={s.tip} numberOfLines={1}>{tip}</Text>
-      {info.uncertain && <Text style={s.warn}>Estimate: log a few more periods to sharpen it.</Text>}
+      <View style={s.cols}>
+        <View style={s.col}><Text style={s.k}>Next period</Text><Text style={s.v}>{SHORT(info.nextPeriod)} · {IN(next)}</Text></View>
+        <View style={s.col}>
+          <Text style={s.k}>{ovIn >= 0 ? 'Ovulation' : 'Fertile window'}</Text>
+          <Text style={s.v}>{ovIn >= 0 ? `${SHORT(info.ovulationDate)} · ${IN(ovIn)}` : `${SHORT(info.fertileStart)} · ${IN(diffDays(info.fertileStart, date))}`}</Text>
+        </View>
+      </View>
+      <Text style={s.tip} numberOfLines={1}>{tip}{info.uncertain ? '  (estimate)' : ''}</Text>
     </View>
   );
 }
@@ -41,7 +43,10 @@ const s = StyleSheet.create({
   chip: { borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3 },
   chipTxt: { fontSize: 12, fontWeight: '900', color: C.ink },
   day: { fontSize: 13, fontWeight: '800', color: C.ink },
+  cols: { flexDirection: 'row', marginTop: 6, gap: 8 },
+  col: { flex: 1 },
+  k: { fontSize: 10, fontWeight: '800', color: C.sub, textTransform: 'uppercase' },
+  v: { fontSize: 13, fontWeight: '800', color: C.ink },
   line: { fontSize: 12, fontWeight: '700', color: C.ink, marginTop: 5 },
   tip: { fontSize: 11, color: C.sub, fontWeight: '600', marginTop: 2 },
-  warn: { fontSize: 10, color: C.sub, marginTop: 2 },
 });
