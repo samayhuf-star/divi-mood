@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { C } from '../theme';
-import { MOODS, addDays, cycleInfoFor, fmt, parse, todayStr, type CycleSettings, type DateStr, type MoodLevel } from '../engine/cycle';
+import { cycleInfoFor, fmt, parse, todayStr, type CycleSettings, type DateStr } from '../engine/cycle';
 import type { Flow } from '../theme';
 
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -14,12 +14,12 @@ interface Props {
   onSelect: (d: DateStr) => void;
   starts: DateStr[];
   flows: Record<DateStr, Flow>;
-  moods: Record<DateStr, MoodLevel>;
+  moods?: unknown;
   settings: CycleSettings;
   hideLegend?: boolean;
 }
 
-export default function Calendar({ month, onMonth, selected, onSelect, starts, flows, moods, settings, hideLegend }: Props) {
+export default function Calendar({ month, onMonth, selected, onSelect, starts, flows, settings, hideLegend }: Props) {
   const m = parse(month);
   const year = m.getFullYear();
   const mon = m.getMonth();
@@ -56,7 +56,7 @@ export default function Calendar({ month, onMonth, selected, onSelect, starts, f
           const fertile = info && (info.phase === 'fertile' || info.phase === 'ovulation');
           const isOv = info?.phase === 'ovulation';
           const isSel = d === selected;
-          const mood = moods[d] ? MOODS.find((x) => x.level === moods[d]) : undefined;
+          const pms = !bleeding && !predictedPeriod && info?.phase === 'pms';
           return (
             <Pressable key={i} style={s.cell} onPress={() => onSelect(d)} accessibilityLabel={`Select ${d}`}>
               <View
@@ -65,6 +65,7 @@ export default function Calendar({ month, onMonth, selected, onSelect, starts, f
                   bleeding && { backgroundColor: C.period },
                   predictedPeriod && { borderWidth: 2, borderColor: C.period, borderStyle: 'dashed' },
                   !bleeding && !predictedPeriod && fertile && { backgroundColor: C.mint },
+                  pms && { backgroundColor: '#EBE2FF' },
                   isOv && { borderWidth: 2, borderColor: C.mintDark },
                   isSel && { borderWidth: 2.5, borderColor: C.ink },
                   d === today && !isSel && { borderWidth: 2, borderColor: C.lilac },
@@ -72,24 +73,25 @@ export default function Calendar({ month, onMonth, selected, onSelect, starts, f
               >
                 <Text style={[s.num, bleeding && { color: '#fff', fontWeight: '800' }]}>{Number(d.slice(8))}</Text>
               </View>
-              <View style={[s.dot, { backgroundColor: mood ? mood.color : 'transparent' }]} />
             </Pressable>
           );
         })}
       </View>
       {!hideLegend && <View style={s.legend}>
         <Legend color={C.period} label="Period" />
+        <Legend color="#fff" border={C.period} label="Expected" />
         <Legend color={C.mint} label="Fertile" />
-        <Legend color={C.lilac} label="Today" />
-        <Text style={s.legendTxt}>● mood</Text>
+        <Legend color="#fff" border={C.mintDark} label="Ovulation" />
+        <Legend color="#EBE2FF" label="PMS" />
+        <Legend color="#fff" border={C.lilac} label="Today" />
       </View>}
     </View>
   );
 }
 
-const Legend = ({ color, label }: { color: string; label: string }) => (
+const Legend = ({ color, label, border }: { color: string; label: string; border?: string }) => (
   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-    <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />
+    <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: color, borderWidth: border ? 2 : 0, borderColor: border }} />
     <Text style={s.legendTxt}>{label}</Text>
   </View>
 );
@@ -102,10 +104,9 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row' },
   dow: { flex: 1, textAlign: 'center', fontSize: 11, color: C.sub, fontWeight: '700', paddingVertical: 2 },
   grid: { flexDirection: 'row', flexWrap: 'wrap' },
-  cell: { width: `${100 / 7}%`, alignItems: 'center', paddingVertical: 1 },
+  cell: { width: `${100 / 7}%`, alignItems: 'center', paddingVertical: 2 },
   day: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   num: { fontSize: 13, color: C.ink, fontWeight: '600' },
-  dot: { width: 6, height: 6, borderRadius: 3, marginTop: 1 },
-  legend: { flexDirection: 'row', justifyContent: 'center', gap: 14, marginTop: 4 },
+  legend: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', columnGap: 10, rowGap: 2, marginTop: 4 },
   legendTxt: { fontSize: 11, color: C.sub },
 });

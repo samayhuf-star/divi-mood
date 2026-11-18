@@ -30,3 +30,19 @@ describe('planHeadsUps', () => {
     out.forEach((a) => { expect(a.date > '2026-11-01').toBe(true); expect(a.level <= 2).toBe(true); });
   });
 });
+
+import { planDailyAlerts } from './alerts';
+describe('planDailyAlerts', () => {
+  const w = { name: 'Wifey', mode: 'partner' as const, starts: ['2026-11-01'], settings: { cycleLength: 28, periodLength: 5, lutealLength: 14 } };
+  it('gives one alert per day including today, within the budget', () => {
+    const a = planDailyAlerts([w], '2026-11-18');
+    expect(a[0].date).toBe('2026-11-18');
+    expect(new Set(a.map((x) => x.date)).size).toBe(a.length);
+    expect(a.length).toBeLessThanOrEqual(44);
+    expect(a[0].title).toContain("Wifey's mood today");
+  });
+  it('shares the budget across people and is empty without history', () => {
+    expect(planDailyAlerts([w, w, w, w], '2026-11-18').length).toBeLessThanOrEqual(44);
+    expect(planDailyAlerts([{ ...w, starts: [] }])).toEqual([]);
+  });
+});

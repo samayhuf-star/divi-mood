@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-import { planHeadsUps, planMoodAlerts, type AlertPerson } from './engine/alerts';
+import { planDailyAlerts, planHeadsUps, type AlertPerson } from './engine/alerts';
 import { parse } from './engine/cycle';
 
 const KEY = 'wifeymood.alerts';
@@ -35,16 +35,16 @@ async function allowed(ask: boolean): Promise<boolean> {
   return (await Notifications.requestPermissionsAsync()).granted;
 }
 
-/** Replaces all pending mood alerts with the next ones for everyone being tracked (8:00 local time). */
+/** Replaces all pending mood alerts with the next ones for everyone being tracked (daily mood at 14:00 local time, heads-ups at 19:00). */
 export async function syncMoodAlerts(people: AlertPerson[], on: boolean, ask = false): Promise<void> {
   if (Platform.OS === 'web') return;
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
     if (!on || !(await allowed(ask))) return;
     const all = [
-      ...planMoodAlerts(people).map((a) => ({ a, hour: 8 })),
-      ...planHeadsUps(people).map((a) => ({ a, hour: 19 })),
-    ].sort((x, y) => (x.a.date + x.hour).localeCompare(y.a.date + y.hour)).slice(0, 60);
+      ...planDailyAlerts(people).map((a) => ({ a, hour: 14 })),
+      ...planHeadsUps(people).slice(0, 16).map((a) => ({ a, hour: 19 })),
+    ].sort((x, y) => (x.a.date + String(x.hour).padStart(2, '0')).localeCompare(y.a.date + String(y.hour).padStart(2, '0'))).slice(0, 62);
     for (const { a, hour } of all) {
       const d = parse(a.date);
       d.setHours(hour, 0, 0, 0);

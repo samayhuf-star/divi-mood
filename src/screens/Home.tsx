@@ -2,18 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Calendar from '../components/Calendar';
 import Penguin from '../components/Penguin';
+import DayInfo from '../components/DayInfo';
 import RiskMeter from '../components/RiskMeter';
 import { C, FLOWS, RISK_COLORS } from '../theme';
-import { MOODS, PARTNER_TIPS, PHASE_TIPS, cycleInfoFor, expectedMood, moodName, pregnancyRisk, todayStr, type MoodLevel } from '../engine/cycle';
+import { cycleInfoFor, expectedMood, moodName, pregnancyRisk, todayStr, type MoodLevel } from '../engine/cycle';
 import { useStore } from '../store';
 import { useMoodSounds } from '../sound';
 import ShareScreen from './ShareScreen';
 
-const EMOJI: Record<MoodLevel, string> = { 6: '😉', 5: '😍', 4: '😊', 3: '😐', 2: '😠', 1: '😢' };
-const PHASE_NAME = { period: 'Period', follicular: 'Follicular', fertile: 'Fertile window', ovulation: 'Ovulation', luteal: 'Luteal', pms: 'PMS days' } as const;
 
 export default function Home({ premium, onUnlock, onAddPerson }: { premium: boolean; onUnlock: () => void; onAddPerson: () => void }) {
-  const { periodStarts, flows, moods, settings, setFlow, setMood, mode, irregular, name, profiles, activeId, switchProfile } = useStore();
+  const { periodStarts, flows, moods, settings, setFlow, mode, name, profiles, activeId, switchProfile } = useStore();
   const partner = mode === 'partner';
   const [selected, setSelected] = useState(todayStr());
   const [month, setMonth] = useState(todayStr());
@@ -48,24 +47,8 @@ export default function Home({ premium, onUnlock, onAddPerson }: { premium: bool
           ))}
           <Pressable onPress={onAddPerson} style={s.who} accessibilityLabel="Add person"><Text style={s.whoTxt}>＋ Add person</Text></Pressable>
         </ScrollView>
-        <Calendar month={month} onMonth={setMonth} selected={selected} onSelect={setSelected} starts={periodStarts} flows={flows} moods={moods} settings={settings} />
-        <View style={s.moodRow}>
-          {MOODS.map((m) => {
-            const on = logged === m.level;
-            return (
-              <Pressable
-                key={m.level}
-                disabled={isFuture}
-                onPress={() => setMood(selected, on ? null : m.level)}
-                style={[s.mood, { backgroundColor: on ? m.color : '#fff', borderColor: m.color, opacity: isFuture ? 0.4 : 1 }]}
-                accessibilityLabel={`Mood ${m.name}`}
-              >
-                <Text style={{ fontSize: 22 }}>{EMOJI[m.level]}</Text>
-                <Text numberOfLines={1} style={[s.moodTxt, on && { color: C.ink }]}>{m.short}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <Calendar month={month} onMonth={setMonth} selected={selected} onSelect={setSelected} starts={periodStarts} flows={flows} settings={settings} />
+        <DayInfo date={selected} starts={periodStarts} settings={settings} partner={partner} />
       </View>
 
       {/* BOTTOM HALF: Divi, whose face follows the mood level */}

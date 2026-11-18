@@ -82,12 +82,12 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
           </Pressable>
         </View>
         <View style={s.row}>
-          <Text style={s.lbl}>Mood-change alerts</Text>
+          <Text style={s.lbl}>Daily mood alerts (2 pm)</Text>
           <Pressable onPress={() => setAlertsOn(!alertsOn)} style={[s.b, { width: 70, borderRadius: 17 }, alertsOn && { backgroundColor: C.pink }]}>
             <Text style={{ fontWeight: '800', color: alertsOn ? '#fff' : C.pink }}>{alertsOn ? 'On' : 'Off'}</Text>
           </Pressable>
         </View>
-        <Text style={s.small}>A notification at 8:00 on each day the mood is expected to change, for everyone you track. Turn off any time.</Text>
+        <Text style={s.small}>A daily notification at 2 pm with the expected mood, plus an evening heads-up before low-mood days, for everyone you track. Turn off any time.</Text>
       </View>
 
       <View style={s.card}>

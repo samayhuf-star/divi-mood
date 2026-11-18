@@ -69,3 +69,34 @@ export function planHeadsUps(people: AlertPerson[], from: DateStr = todayStr(), 
   }
   return out.filter((a) => a.date > from).sort((a, b) => a.date.localeCompare(b.date));
 }
+
+/**
+ * One notification per day per person (delivered at 14:00) telling today's expected mood.
+ * `budget` caps the total so iOS's 64 pending-notification limit is never exceeded.
+ */
+export function planDailyAlerts(people: AlertPerson[], from: DateStr = todayStr(), budget = 44): MoodAlert[] {
+  const tracked = people.filter((p) => p.starts.length > 0);
+  if (tracked.length === 0) return [];
+  const days = Math.max(1, Math.min(30, Math.floor(budget / tracked.length)));
+  const out: MoodAlert[] = [];
+  for (const p of tracked) {
+    let prev: MoodLevel | null = null;
+    for (let i = -1; i < days; i++) {
+      const d = addDays(from, i);
+      const info = cycleInfoFor(d, p.starts, p.settings);
+      if (!info) continue;
+      const level = expectedMood(info.phase);
+      if (i >= 0) {
+        const who = p.mode === 'self' ? 'You are' : `${p.name} is`;
+        const changed = prev !== null && prev !== level;
+        out.push({
+          date: d, name: p.name, level,
+          title: `Divi: ${p.mode === 'self' ? 'your' : `${p.name}'s`} mood today ${EMOJI[level]}`,
+          body: `${who} likely ${moodName(level)}${changed ? ' (a change from yesterday)' : ''}. ${(p.mode === 'partner' ? PARTNER_TIPS : PHASE_TIPS)[info.phase]}`,
+        });
+      }
+      prev = level;
+    }
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
