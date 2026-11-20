@@ -134,7 +134,7 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
         )}
 
         <View style={s.actions}>
-          <Pressable style={[s.act, isFuture && { opacity: 0.45 }]} disabled={isFuture} onPress={() => setMoodOpen(true)} accessibilityLabel="Log mood"><Text style={s.actTxt}>{logged ? '✏️ Mood' : '🐧 Log mood'}</Text></Pressable>
+          <Pressable style={[s.act, isFuture && { opacity: 0.45 }]} disabled={isFuture} onPress={() => setMoodOpen(true)} accessibilityLabel="Log mood"><Text style={s.actTxt}>{logged ? '✏️ Mood' : '🐧 Mood'}</Text></Pressable>
           <Pressable style={s.act} onPress={() => setHistOpen(true)} accessibilityLabel="Calendar, past months"><Text style={s.actTxt}>📅 Calendar</Text></Pressable>
           <Pressable style={s.act} onPress={() => setShareOpen(true)} accessibilityLabel="Share mood"><Text style={s.actTxt}>📤 Share</Text></Pressable>
           <Pressable style={s.act} onPress={() => setIdeasOpen(true)} accessibilityLabel="Message ideas"><Text style={s.actTxt}>💌 Ideas</Text></Pressable>
@@ -168,8 +168,8 @@ const s = StyleSheet.create({
   flowLabel: { fontSize: 11, fontWeight: '800', color: C.ink },
   flow: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 8, paddingVertical: 6 },
   flowTxt: { fontSize: 11, fontWeight: '700', color: C.ink },
-  actions: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingHorizontal: 10 },
-  act: { backgroundColor: C.pink, paddingHorizontal: 11, paddingVertical: 9, borderRadius: 18 },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6, paddingHorizontal: 10 },
+  act: { backgroundColor: C.pink, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 18 },
   actReset: { backgroundColor: '#fff' },
   actTxt: { color: '#fff', fontWeight: '900', fontSize: 12 },
 });
