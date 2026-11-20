@@ -7,6 +7,7 @@ import { useAlertSetting } from '../notifications';
 import { makeCode } from '../shareCode';
 import { startsFromFlows } from '../store';
 import { openCustomerCenter } from '../purchases';
+import { cancelMoodAlerts } from '../notifications';
 import DoctorSummary from '../components/DoctorSummary';
 
 export default function Settings({ premium, onUnlock, onRestore, onRestart }: { premium: boolean; onUnlock: () => void; onRestore: () => void; onRestart: () => void }) {
@@ -28,7 +29,7 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
     if (Platform.OS === 'web') { setConfirm(true); return; }
     Alert.alert('Delete all data?', 'This removes every log from this phone and cannot be undone.', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: wipe },
+      { text: 'Delete', style: 'destructive', onPress: () => { wipe(); cancelMoodAlerts(); } },
     ]);
   };
 
@@ -116,7 +117,7 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
         <Pressable onPress={() => Linking.openURL('mailto:samayhuf@gmail.com')} style={{ paddingVertical: 8 }}><Text style={s.link}>Contact support</Text></Pressable>
         {confirm ? (
           <View style={{ flexDirection: 'row', gap: 12, marginTop: 6 }}>
-            <Pressable onPress={() => { wipe(); setConfirm(false); }}><Text style={[s.link, { color: '#D6335A' }]}>Yes, delete everything</Text></Pressable>
+            <Pressable onPress={() => { wipe(); cancelMoodAlerts(); setConfirm(false); }}><Text style={[s.link, { color: '#D6335A' }]}>Yes, delete everything</Text></Pressable>
             <Pressable onPress={() => setConfirm(false)}><Text style={s.link}>Cancel</Text></Pressable>
           </View>
         ) : (

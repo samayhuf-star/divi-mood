@@ -35,6 +35,12 @@ async function allowed(ask: boolean): Promise<boolean> {
   return (await Notifications.requestPermissionsAsync()).granted;
 }
 
+/** Cancels every pending mood alert (used when all data is deleted). */
+export async function cancelMoodAlerts(): Promise<void> {
+  if (Platform.OS === 'web') return;
+  try { await Notifications.cancelAllScheduledNotificationsAsync(); } catch { /* best-effort */ }
+}
+
 /** Replaces all pending mood alerts with the next ones for everyone being tracked (daily mood at 14:00 local time, heads-ups at 19:00). */
 export async function syncMoodAlerts(people: AlertPerson[], on: boolean, ask = false): Promise<void> {
   if (Platform.OS === 'web') return;

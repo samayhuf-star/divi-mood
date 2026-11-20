@@ -12,11 +12,12 @@ import { useMoodSounds } from '../sound';
 import ShareScreen from './ShareScreen';
 import MessageIdeas from '../components/MessageIdeas';
 import DoctorSummary from '../components/DoctorSummary';
+import MoodLogger from '../components/MoodLogger';
 import { lateStatus } from '../engine/late';
 
 
 export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { premium: boolean; onUnlock: () => void; onAddPerson: () => void; onRestart: () => void }) {
-  const { periodStarts, flows, moods, settings, setFlow, mode, name, profiles, activeId, switchProfile } = useStore();
+  const { periodStarts, flows, moods, settings, setFlow, setMood, mode, name, profiles, activeId, switchProfile } = useStore();
   const partner = mode === 'partner';
   const [selected, setSelected] = useState(todayStr());
   const [month, setMonth] = useState(todayStr());
@@ -36,6 +37,7 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
   const [shareOpen, setShareOpen] = useState(false);
   const [ideasOpen, setIdeasOpen] = useState(false);
   const [docOpen, setDocOpen] = useState(false);
+  const [moodOpen, setMoodOpen] = useState(false);
   const late = lateStatus(todayStr(), periodStarts, settings);
   const todayInfo = cycleInfoFor(todayStr(), periodStarts, settings);
   const first = useRef(true);
@@ -56,6 +58,7 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
     <View style={{ flex: 1 }}>
       <ShareScreen visible={shareOpen} who={mode === 'self' ? 'You are' : name} level={face} onClose={() => setShareOpen(false)} />
       <MessageIdeas visible={ideasOpen} phase={(todayInfo ?? info)?.phase ?? 'follicular'} partner={partner} onClose={() => setIdeasOpen(false)} />
+      <MoodLogger visible={moodOpen} who={mode === 'self' ? 'you' : name} date={selected} current={logged} onPick={(m) => setMood(selected, m)} onClose={() => setMoodOpen(false)} />
       <DoctorSummary visible={docOpen} name={name} starts={periodStarts} flows={flows} settings={settings} onClose={() => setDocOpen(false)} />
       <HistoryCalendar visible={histOpen} starts={periodStarts} flows={flows} settings={settings} onPick={(d) => { setSelected(d); setMonth(d); setExpanded(true); setHistOpen(false); }} onClose={() => setHistOpen(false)} />
 
@@ -131,6 +134,7 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
         )}
 
         <View style={s.actions}>
+          <Pressable style={[s.act, isFuture && { opacity: 0.45 }]} disabled={isFuture} onPress={() => setMoodOpen(true)} accessibilityLabel="Log mood"><Text style={s.actTxt}>{logged ? '✏️ Mood' : '🐧 Log mood'}</Text></Pressable>
           <Pressable style={s.act} onPress={() => setHistOpen(true)} accessibilityLabel="Calendar, past months"><Text style={s.actTxt}>📅 Calendar</Text></Pressable>
           <Pressable style={s.act} onPress={() => setShareOpen(true)} accessibilityLabel="Share mood"><Text style={s.actTxt}>📤 Share</Text></Pressable>
           <Pressable style={s.act} onPress={() => setIdeasOpen(true)} accessibilityLabel="Message ideas"><Text style={s.actTxt}>💌 Ideas</Text></Pressable>
