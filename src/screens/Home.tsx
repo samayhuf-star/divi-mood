@@ -6,7 +6,7 @@ import Penguin from '../components/Penguin';
 import DayInfo from '../components/DayInfo';
 import RiskMeter from '../components/RiskMeter';
 import { C, FLOWS, RISK_COLORS } from '../theme';
-import { cycleInfoFor, expectedMood, moodName, pregnancyRisk, todayStr, type MoodLevel } from '../engine/cycle';
+import { MOODS, cycleInfoFor, expectedMood, moodName, pregnancyRisk, todayStr, type MoodLevel } from '../engine/cycle';
 import { useStore } from '../store';
 import { useMoodSounds } from '../sound';
 import ShareScreen from './ShareScreen';
@@ -16,7 +16,7 @@ import { lateStatus } from '../engine/late';
 
 
 export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { premium: boolean; onUnlock: () => void; onAddPerson: () => void; onRestart: () => void }) {
-  const { periodStarts, flows, moods, settings, setFlow, mode, name, profiles, activeId, switchProfile } = useStore();
+  const { periodStarts, flows, moods, settings, setFlow, setMood, mode, name, profiles, activeId, switchProfile } = useStore();
   const partner = mode === 'partner';
   const [selected, setSelected] = useState(todayStr());
   const [month, setMonth] = useState(todayStr());
@@ -108,6 +108,17 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
           )}
         </View>
 
+        <View style={s.moodBar} accessibilityLabel="Log mood for the selected day">
+          {MOODS.map((m) => {
+            const on = logged === m.level;
+            return (
+              <Pressable key={m.level} disabled={isFuture} accessibilityLabel={`Log mood ${m.name}`} onPress={() => setMood(selected, on ? null : m.level)} style={[s.moodChip, on && { backgroundColor: m.color, borderColor: m.color }, isFuture && { opacity: 0.4 }]}>
+                <Text style={[s.moodTxt, on && { color: '#fff' }]} numberOfLines={1}>{m.short}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
         {partner ? (
           <View style={s.flowBar}>
             <Pressable disabled={isFuture} onPress={() => setFlow(selected, flows[selected] ? null : 'medium')} style={[s.flow, { paddingHorizontal: 16, paddingVertical: 9 }, flows[selected] && { backgroundColor: C.period }]}>
@@ -154,6 +165,9 @@ const s = StyleSheet.create({
   caption: { flex: 1, fontSize: 15, fontWeight: '900', color: C.ink },
   riskPill: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 4 },
   riskPillTxt: { fontSize: 12, fontWeight: '900', color: C.sub },
+  moodBar: { flexDirection: 'row', gap: 4, paddingHorizontal: 12, paddingBottom: 6 },
+  moodChip: { flex: 1, backgroundColor: '#fff', borderRadius: 14, borderWidth: 2, borderColor: C.pinkSoft, paddingVertical: 5, alignItems: 'center' },
+  moodTxt: { fontSize: 11, fontWeight: '800', color: C.ink },
   mid: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8 },
   pengArea: { flex: 1, alignSelf: 'stretch', alignItems: 'center', justifyContent: 'center' },
   riskChip: { backgroundColor: '#fff', borderRadius: 18, padding: 8, alignItems: 'center', width: 138 },

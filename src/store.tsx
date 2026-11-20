@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_SETTINGS, type CycleSettings, type DateStr, type MoodLevel, addDays, diffDays } from './engine/cycle';
 import type { Flow } from './theme';
+import { cancelAllMoodAlerts } from './notifications';
 
 // All data lives on the device only. No account, no server, nothing shared.
 export type Mode = 'self' | 'partner'; // self = own cycle, partner = someone else's mood forecast from what the user enters
@@ -165,7 +166,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       renameProfile: (id, name) => update((d) => ({ ...d, profiles: d.profiles.map((p) => (p.id === id ? { ...p, name: name.trim() || p.name } : p)) })),
       finishOnboarding: (np) => update((d) => { const pr = makeProfile(np); return { ...d, onboarded: true, profiles: [pr], activeId: pr.id }; }),
       acceptDisclaimer: () => update((d) => ({ ...d, disclaimerAccepted: true })),
-      wipe: () => update(() => ({ ...EMPTY })),
+      wipe: () => { cancelAllMoodAlerts(); update(() => ({ ...EMPTY })); },
     };
   }, [data, ready, update]);
 

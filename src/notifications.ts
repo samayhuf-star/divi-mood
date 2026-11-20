@@ -57,3 +57,9 @@ export async function syncMoodAlerts(people: AlertPerson[], on: boolean, ask = f
     }
   } catch { /* notifications are best-effort; never crash the app */ }
 }
+
+/** Cancels every pending alert (used when the user deletes all data, so no reminder with names or cycle info is left behind). */
+export async function cancelAllMoodAlerts(): Promise<void> {
+  if (Platform.OS === 'web') return;
+  try { await Notifications.cancelAllScheduledNotificationsAsync(); } catch { /* best-effort */ }
+}
