@@ -74,7 +74,7 @@ export default function PersonForm({ mode, submitLabel, onSubmit, initialName }:
         <View style={s.card}>
           <Text style={s.q}>{partner ? '1. When did her last period start?' : '1. When did your last period start?'}</Text>
           <Text style={s.sub}>{dont ? 'Skipped' : `Selected: ${parse(lastDate).toDateString().slice(0, 10)} (${diffDays(todayStr(), lastDate)} days ago)`}</Text>
-          <View style={dont ? { opacity: 0.35 } : undefined} pointerEvents={dont ? 'none' : 'auto'}>
+          <View style={[{ marginTop: 12, marginBottom: 12 }, dont ? { opacity: 0.35 } : undefined]} pointerEvents={dont ? 'none' : 'auto'}>
             <Calendar
               month={month}
               onMonth={setMonth}
@@ -87,7 +87,7 @@ export default function PersonForm({ mode, submitLabel, onSubmit, initialName }:
               hideLegend
             />
           </View>
-          <Pressable onPress={() => setDont(!dont)} style={{ paddingBottom: 6 }}>
+          <Pressable onPress={() => setDont(!dont)} style={{ paddingVertical: 10 }} accessibilityRole="button">
             <Text style={{ color: C.pink, fontWeight: '700' }}>{dont ? '✓ ' : ''}{partner ? "I don't know" : "I don't remember"}</Text>
           </Pressable>
         </View>
