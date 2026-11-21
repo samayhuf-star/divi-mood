@@ -178,8 +178,8 @@ const s = StyleSheet.create({
   flowLabel: { fontSize: 11, fontWeight: '800', color: C.ink },
   flow: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 8, paddingVertical: 6 },
   flowTxt: { fontSize: 11, fontWeight: '700', color: C.ink },
-  actions: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingHorizontal: 10 },
-  act: { backgroundColor: C.pink, paddingHorizontal: 11, paddingVertical: 9, borderRadius: 18 },
+  actions: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 6, paddingHorizontal: 10 },
+  act: { backgroundColor: C.pink, paddingHorizontal: 10, paddingVertical: 8, borderRadius: 18 },
   actReset: { backgroundColor: '#fff' },
   actTxt: { color: '#fff', fontWeight: '900', fontSize: 12 },
 });

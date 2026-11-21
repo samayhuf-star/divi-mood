@@ -10,7 +10,7 @@ import Settings from './src/screens/Settings';
 import { C } from './src/theme';
 import PersonForm from './src/components/PersonForm';
 import LaunchSplash from './src/components/LaunchSplash';
-import { syncMoodAlerts, useAlertSetting } from './src/notifications';
+import { cancelMoodAlerts, syncMoodAlerts, useAlertSetting } from './src/notifications';
 import { cycleInfoFor, expectedMood, todayStr, type MoodLevel } from './src/engine/cycle';
 import { parseCode } from './src/shareCode';
 import { syncWidget } from './src/widgetSync';
@@ -47,7 +47,9 @@ function Root() {
 
   // Keep the phone's scheduled mood-change alerts in step with everyone being tracked.
   useEffect(() => {
-    if (!ready || !onboarded) return;
+    if (!ready) return;
+    // After "Delete all data" nobody is tracked any more: drop every pending reminder (names, cycle info).
+    if (!onboarded) { cancelMoodAlerts(); return; }
     syncMoodAlerts(
       profiles.map((p) => ({ name: p.name, mode: p.mode, starts: startsFromFlows(p.flows), settings: p.settings })),
       alertsOn,
