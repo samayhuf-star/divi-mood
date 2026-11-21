@@ -58,7 +58,7 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
           <Text style={s.body}>Pick one to start. You can add more people later, each with their own penguin.</Text>
           <Pressable style={[s.big, mode === 'self' && s.bigOn]} onPress={() => setMode('self')}>
             <Text style={s.bigTitle}>My own cycle</Text>
-            <Text style={s.bigSub}>Log my period, flow and mood. See my fertile days and the pregnancy risk meter.</Text>
+            <Text style={s.bigSub}>Log my period, flow and mood. See my fertile days and the pregnancy risk meter (estimates only, not medical advice or birth control).</Text>
           </Pressable>
           <Pressable style={[s.big, mode === 'partner' && s.bigOn]} onPress={() => setMode('partner')}>
             <Text style={s.bigTitle}>Someone I care about</Text>

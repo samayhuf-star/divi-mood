@@ -112,6 +112,7 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
       <View style={s.card}>
         <Text style={s.title}>Your privacy</Text>
         <Text style={s.small}>All logs are stored only on this phone. No account, no ads, no tracking of your cycle data. Nothing is sold or shared.</Text>
+        <Text style={[s.small, { marginTop: 6 }]}>Divi Mood is for general wellness and tracking only. It is not medical advice, does not diagnose anything, and is not a contraceptive. Predictions are estimates. Talk to a doctor about health concerns.</Text>
         <Pressable onPress={() => Linking.openURL('https://klenzer.online/divi-mood/privacy')} style={{ paddingVertical: 8 }}><Text style={s.link}>Privacy policy</Text></Pressable>
         <Pressable onPress={() => Linking.openURL('https://klenzer.online/divi-mood/terms')} style={{ paddingVertical: 8 }}><Text style={s.link}>Terms of use</Text></Pressable>
         <Pressable onPress={() => Linking.openURL('mailto:samayhuf@gmail.com')} style={{ paddingVertical: 8 }}><Text style={s.link}>Contact support</Text></Pressable>
