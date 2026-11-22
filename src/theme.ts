@@ -15,7 +15,6 @@ export const C = {
   line: '#D3EAEA',
 };
 
-export const RISK_COLORS = ['#4FB58A', '#9ED8A8', '#FFC46B', '#FF9A6B', '#FF5A7A'];
 
 export const FLOWS = [
   { id: 'spotting', name: 'Spotting', drops: 1 },

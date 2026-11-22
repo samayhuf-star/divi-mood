@@ -58,7 +58,7 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
           <Text style={s.body}>Pick one to start. You can add more people later, each with their own penguin.</Text>
           <Pressable style={[s.big, mode === 'self' && s.bigOn]} onPress={() => setMode('self')}>
             <Text style={s.bigTitle}>My own cycle</Text>
-            <Text style={s.bigSub}>Log my period, flow and mood. See my fertile days and the pregnancy risk meter.</Text>
+            <Text style={s.bigSub}>Log my period, flow and mood. See my estimated fertile window.</Text>
           </Pressable>
           <Pressable style={[s.big, mode === 'partner' && s.bigOn]} onPress={() => setMode('partner')}>
             <Text style={s.bigTitle}>Someone I care about</Text>
@@ -94,7 +94,7 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
               ]
             : [
                 ['Free forever', 'Calendar, period + flow log, mood levels, Divi, full history. No paywall on the basics.'],
-                ['Divi Plus', 'Pregnancy risk meter, mood insights by cycle phase, 7-day forecast. 7-day free trial.'],
+                ['Divi Plus', 'Mood insights by cycle phase and a 7-day mood forecast. 7-day free trial.'],
                 ['More people', 'Add more people, each with their own named penguin. Each extra person is a small monthly add-on.'],
               ]
           ).map(([t, b]) => (
@@ -109,7 +109,7 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
           <Text style={{ color: C.ink, marginTop: 4, lineHeight: 20 }}>
             {partner
               ? 'Mood forecasts are a light-hearted guess based on what you entered. Moods vary from day to day and person to person, and she is the real expert on how she feels. Not medical advice.'
-              : 'Divi Mood is for general wellness and is not a medical device or a method of birth control. Predictions are estimates and can be wrong. The pregnancy risk meter is not a guarantee of safety. Talk to a doctor for medical advice or reliable contraception.'}
+              : 'Divi Mood is for general wellness and is not a medical device or a method of birth control. Predictions are estimates and can be wrong. Fertile-window dates are calendar estimates, not a guarantee. Talk to a doctor for medical advice or reliable contraception.'}
           </Text>
         </View>
       </ScrollView>
