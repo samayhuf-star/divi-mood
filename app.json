@@ -87,8 +87,10 @@
     "extra": {
       "eas": {
         "projectId": "f984a355-a377-4d44-a4de-907bfd9513e3"
-      }
+      },
+      "privacyPolicyUrl": "https://klenzer.online/divi-mood/privacy"
     },
-    "owner": "krosz"
+    "owner": "krosz",
+    "description": "Divi Mood is a mood and cycle tracker with Divi the penguin. Log how you feel each day and see your patterns."
   }
 }
