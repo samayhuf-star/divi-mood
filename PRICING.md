@@ -8,7 +8,7 @@ Decided by Samay (17 Nov 2026; updated later the same day to $2.99 / $4.99 / $29
 | Monthly | $4.99 | 7 days | `$rc_monthly` |
 | Yearly | $29.99 | 7 days | `$rc_annual` |
 
-Entitlement: `premium` (risk meter, 7-day forecast). Free: first person, calendar, flow and mood log, Divi, full history.
+Entitlement: `premium` (mood insights by cycle phase, 7-day forecast). Free: first person, calendar with the fertile window (estimate), flow and mood log, Divi, full history. The pregnancy risk meter was removed on 22 Nov 2026 (App Review guideline 1.4.1).
 
 Extra people (assumption, $1.99/month each, to be confirmed): subscription tiers mapped to entitlements `people_2`, `people_3`, `people_4`, `people_5` (slots = 1 + highest active tier), because Apple has no per-quantity subscriptions.
 

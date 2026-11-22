@@ -4,9 +4,8 @@ import HistoryCalendar from '../components/HistoryCalendar';
 import Calendar from '../components/Calendar';
 import Penguin from '../components/Penguin';
 import DayInfo from '../components/DayInfo';
-import RiskMeter from '../components/RiskMeter';
-import { C, FLOWS, RISK_COLORS } from '../theme';
-import { MOODS, cycleInfoFor, expectedMood, moodName, pregnancyRisk, todayStr, type MoodLevel } from '../engine/cycle';
+import { C, FLOWS } from '../theme';
+import { MOODS, cycleInfoFor, expectedMood, moodName, fertileStatus, todayStr, type MoodLevel } from '../engine/cycle';
 import { useStore } from '../store';
 import { useMoodSounds } from '../sound';
 import ShareScreen from './ShareScreen';
@@ -25,7 +24,7 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
   const [box, setBox] = useState({ w: 0, h: 0 });
 
   const info = cycleInfoFor(selected, periodStarts, settings);
-  const risk = pregnancyRisk(selected, periodStarts, settings);
+  const fertile = fertileStatus(selected, periodStarts, settings);
   const logged = moods[selected];
   const face: MoodLevel = logged ?? (info ? expectedMood(info.phase) : 3);
   const isFuture = selected > todayStr();
@@ -89,10 +88,10 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
       <View style={s.bottom}>
         <View style={s.capRow}>
           <Text style={s.caption} numberOfLines={1}>{logged ? `${name} · ${moodName(logged)}` : info ? `${name} · likely ${moodName(face)}` : name}</Text>
-          {!expanded && !partner && (
-            <Pressable onPress={premium ? undefined : onUnlock} style={s.riskPill} accessibilityLabel="Pregnancy risk">
-              <Text style={[s.riskPillTxt, premium && risk && { color: RISK_COLORS[risk.level] }]}>{premium && risk ? `Risk: ${risk.label}` : '🔒 Risk'}</Text>
-            </Pressable>
+          {!expanded && !partner && fertile && (
+            <View style={s.riskPill} accessibilityLabel="Fertile window, estimate">
+              <Text style={s.riskPillTxt}>Fertile (est.): {fertile.label}</Text>
+            </View>
           )}
         </View>
 
@@ -100,11 +99,12 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
           <Pressable style={s.pengArea} onLayout={(e) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })} onPress={() => { play(face); setPulse((n) => n + 1); }} accessibilityLabel="Tap the penguin">
             {box.h > 0 && <Penguin level={face} size={pengSize} pulse={pulse} />}
           </Pressable>
-          {expanded && !partner && (
-            <Pressable style={s.riskChip} onPress={premium ? undefined : onUnlock} accessibilityLabel="Pregnancy risk">
-              <Text style={s.riskTitle}>Pregnancy risk</Text>
-              {premium && risk ? <RiskMeter risk={risk} compact /> : <Text style={{ fontSize: 13, color: C.pink, fontWeight: '800', marginTop: 6 }}>🔒 Plus</Text>}
-            </Pressable>
+          {expanded && !partner && fertile && (
+            <View style={s.riskChip} accessibilityLabel="Fertile window, estimate">
+              <Text style={s.riskTitle}>Fertile window (est.)</Text>
+              <Text style={{ fontSize: 14, color: C.ink, fontWeight: '900', marginTop: 6, textAlign: 'center' }}>{fertile.label}</Text>
+              {fertile.uncertain && <Text style={{ fontSize: 10, color: C.sub, textAlign: 'center', marginTop: 2 }}>Less certain</Text>}
+            </View>
           )}
         </View>
 
@@ -184,4 +184,3 @@ const s = StyleSheet.create({
   actTxt: { color: '#fff', fontWeight: '900', fontSize: 12 },
 });
 
-export { RISK_COLORS };

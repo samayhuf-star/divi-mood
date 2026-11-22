@@ -128,7 +128,7 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
       <View style={[s.card, { backgroundColor: '#FFF0D6' }]}>
         <Text style={s.title}>Medical disclaimer</Text>
         <Text style={s.small}>
-          Divi Mood is for general wellness tracking only. It is not a medical device, does not diagnose, treat or prevent any condition, and is not a method of contraception. Predictions and the pregnancy risk meter are estimates based on a calendar method and can be wrong, especially with irregular cycles. Always check with a doctor before making medical decisions.
+          Divi Mood is for general wellness tracking only. It is not a medical device, does not diagnose, treat or prevent any condition, and is not a method of contraception. Predictions and fertile-window dates are estimates based on a calendar method and can be wrong, especially with irregular cycles. Always check with a doctor before making medical decisions.
         </Text>
       </View>
     </ScrollView>

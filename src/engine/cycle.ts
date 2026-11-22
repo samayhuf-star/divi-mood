@@ -1,10 +1,9 @@
-// Pure cycle / phase / pregnancy-risk logic. No React, no storage, fully unit-tested.
+// Pure cycle / phase / fertile-window logic. No React, no storage, fully unit-tested.
 // Dates are handled as local "YYYY-MM-DD" strings to avoid timezone/DST bugs.
 
 export type DateStr = string;
 
 export type Phase = 'period' | 'follicular' | 'fertile' | 'ovulation' | 'luteal' | 'pms';
-export type RiskLevel = 0 | 1 | 2 | 3 | 4; // Very low .. Very high
 
 export interface CycleSettings {
   cycleLength: number; // default average cycle length
@@ -14,7 +13,6 @@ export interface CycleSettings {
 
 export const DEFAULT_SETTINGS: CycleSettings = { cycleLength: 28, periodLength: 5, lutealLength: 14 };
 
-export const RISK_LABELS = ['Very low', 'Low', 'Medium', 'High', 'Very high'] as const;
 
 // ---------- date helpers ----------
 export function parse(d: DateStr): Date {
@@ -142,42 +140,35 @@ export function cycleInfoFor(
   };
 }
 
-// ---------- pregnancy risk meter ----------
-export interface RiskResult {
-  level: RiskLevel;
-  label: (typeof RISK_LABELS)[number];
-  percent: number; // 0..100 gauge position (an indicator, NOT a probability)
+// ---------- fertile window (estimate) ----------
+export interface FertileStatus {
+  state: 'open' | 'upcoming' | 'passed';
+  /** Short status for chips, e.g. "Open now", "Opens in 4 days", "Passed". */
+  label: string;
+  /** Window this status refers to (the next one when this cycle's has passed). */
+  start: DateStr;
+  end: DateStr;
+  ovulation: DateStr;
   uncertain: boolean;
-  reason: string;
 }
 
 /**
- * Calendar-method estimate only. It is deliberately conservative:
- * - irregular cycles or little history bump the level up one step and are flagged "uncertain"
- * - it is never "zero": the lowest level is "Very low", not "Safe".
+ * Calendar-method estimate of the fertile window only: dates, never a likelihood.
+ * It makes no statement about the chance of pregnancy on any day.
  */
-export function pregnancyRisk(date: DateStr, starts: DateStr[], settings: CycleSettings = DEFAULT_SETTINGS): RiskResult | null {
+export function fertileStatus(date: DateStr, starts: DateStr[], settings: CycleSettings = DEFAULT_SETTINGS): FertileStatus | null {
   const info = cycleInfoFor(date, starts, settings);
   if (!info) return null;
-  const rel = diffDays(date, info.ovulationDate); // 0 = ovulation day
-
-  let level: RiskLevel;
-  let reason: string;
-  if (rel === 0 || rel === -1) { level = 4; reason = 'Around ovulation, the most fertile days'; }
-  else if (rel === -2) { level = 3; reason = 'Fertile window, 2 days before ovulation'; }
-  else if (rel === 1 || rel === -3) { level = 3; reason = rel === 1 ? 'Egg can still be viable after ovulation' : 'Fertile window, sperm can survive for days'; }
-  else if (rel === -4 || rel === -5 || rel === 2) { level = 2; reason = 'Edge of the fertile window'; }
-  else if (info.phase === 'period') { level = 1; reason = 'During period, lower but not zero'; }
-  else if (rel > 2) { level = 0; reason = 'Late in the cycle, lowest estimated risk'; }
-  else { level = 1; reason = 'Early follicular phase, low estimated risk'; }
-
   const uncertain = info.uncertain;
-  if (uncertain && level < 4) {
-    level = (level + 1) as RiskLevel;
-    reason += ' (raised one step: your cycles are irregular or we have little history)';
+  if (date >= info.fertileStart && date <= info.fertileEnd) {
+    return { state: 'open', label: 'Open now', start: info.fertileStart, end: info.fertileEnd, ovulation: info.ovulationDate, uncertain };
   }
-  const percent = [8, 28, 52, 76, 96][level];
-  return { level, label: RISK_LABELS[level], percent, uncertain, reason };
+  if (date < info.fertileStart) {
+    const n = diffDays(info.fertileStart, date);
+    return { state: 'upcoming', label: n === 1 ? 'Opens tomorrow' : `Opens in ${n} days`, start: info.fertileStart, end: info.fertileEnd, ovulation: info.ovulationDate, uncertain };
+  }
+  const shift = info.cycleLength;
+  return { state: 'passed', label: 'Passed', start: addDays(info.fertileStart, shift), end: addDays(info.fertileEnd, shift), ovulation: addDays(info.ovulationDate, shift), uncertain };
 }
 
 // ---------- mood ----------

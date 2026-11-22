@@ -1,8 +1,7 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import RiskMeter from '../components/RiskMeter';
 import { C } from '../theme';
-import { MOODS, PARTNER_TIPS, addDays, cycleInfoFor, expectedMood, moodName, pregnancyRisk, todayStr } from '../engine/cycle';
+import { MOODS, PARTNER_TIPS, addDays, cycleInfoFor, expectedMood, moodName, fertileStatus, todayStr } from '../engine/cycle';
 import { useStore } from '../store';
 
 const nice = (d: string) => new Date(Number(d.slice(0, 4)), Number(d.slice(5, 7)) - 1, Number(d.slice(8)), 12).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -19,7 +18,7 @@ export default function Insights({ premium, onUnlock }: { premium: boolean; onUn
   const ovNext = info ? addDays(info.ovulationDate, shift) : '';
   const fsNext = info ? addDays(info.fertileStart, shift) : '';
   const feNext = info ? addDays(info.fertileEnd, shift) : '';
-  const risk = pregnancyRisk(today, periodStarts, settings);
+  const fertile = fertileStatus(today, periodStarts, settings);
   const logged = Object.keys(moods).sort();
   let streak = 0;
   for (let d = moods[today] ? today : addDays(today, -1); moods[d]; d = addDays(d, -1)) streak++;
@@ -63,21 +62,19 @@ export default function Insights({ premium, onUnlock }: { premium: boolean; onUn
         </View>
       ) : (
       <View style={s.card}>
-        <Text style={s.cardTitle}>Pregnancy risk meter</Text>
-        {premium && risk ? (
+        <Text style={s.cardTitle}>Fertile window (estimate)</Text>
+        {fertile ? (
           <>
-            <RiskMeter risk={risk} />
-            <Text style={s.reason}>{risk.reason}</Text>
+            <Text style={{ textAlign: 'center', fontSize: 22, fontWeight: '900', color: C.ink, marginTop: 6 }}>{fertile.label}</Text>
+            <Text style={s.reason}>{fertile.state === 'passed' ? 'Next estimated window' : 'Estimated window'}: {nice(fertile.start)} – {nice(fertile.end)}</Text>
+            <Text style={s.reason}>Ovulation (est.): {nice(fertile.ovulation)}</Text>
+            {fertile.uncertain && <Text style={s.reason}>Less certain: irregular cycles or little history</Text>}
           </>
         ) : (
-          <Pressable onPress={onUnlock} style={s.lock}>
-            <Text style={{ fontSize: 34 }}>🔒</Text>
-            <Text style={{ color: C.ink, fontWeight: '800', marginTop: 4 }}>Unlock with Divi Plus</Text>
-            <Text style={{ color: C.sub, marginTop: 2 }}>7-day free trial</Text>
-          </Pressable>
+          <Text style={s.reason}>Add a period start date to see an estimate.</Text>
         )}
         <Text style={s.warn}>
-          This is a calendar-based estimate, not a guarantee and not birth control. "Very low" never means zero. Use reliable contraception if you want to avoid pregnancy, and ask a doctor if unsure.
+          These dates are a calendar-based estimate and can be wrong, especially with irregular cycles. They say nothing about the chance of pregnancy on any day and are not birth control or medical advice. Ask a doctor if unsure.
         </Text>
       </View>
       )}

@@ -1,6 +1,6 @@
 import {
   addDays, averageCycle, cleanStarts, cycleInfoFor, cycleLengths, cycleVariability,
-  diffDays, expectedMood, pregnancyRisk,
+  diffDays, expectedMood, fertileStatus,
 } from './cycle';
 
 const regular = ['2026-08-01', '2026-08-29', '2026-09-26', '2026-10-24']; // 28-day cycles
@@ -64,28 +64,29 @@ describe('cycleInfoFor', () => {
   });
 });
 
-describe('pregnancyRisk', () => {
-  it('is very high on ovulation day and day before, regular cycles', () => {
-    expect(pregnancyRisk('2026-11-07', regular)!.level).toBe(4);
-    expect(pregnancyRisk('2026-11-06', regular)!.level).toBe(4);
+describe('fertileStatus', () => {
+  it('is open across the estimated window, regular cycles', () => {
+    expect(fertileStatus('2026-11-07', regular)!.state).toBe('open');
+    expect(fertileStatus('2026-11-02', regular)!.state).toBe('open');
+    expect(fertileStatus('2026-11-08', regular)!.state).toBe('open');
   });
-  it('is high in the fertile window and drops late in the cycle', () => {
-    expect(pregnancyRisk('2026-11-05', regular)!.level).toBe(3);
-    expect(pregnancyRisk('2026-11-08', regular)!.level).toBe(3);
-    expect(pregnancyRisk('2026-11-15', regular)!.level).toBe(0);
+  it('counts down before the window and points to the next one after it', () => {
+    const before = fertileStatus('2026-10-30', regular)!;
+    expect(before.state).toBe('upcoming');
+    expect(before.label).toBe('Opens in 3 days');
+    const after = fertileStatus('2026-11-15', regular)!;
+    expect(after.state).toBe('passed');
+    expect(after.start > '2026-11-15').toBe(true);
   });
-  it('never claims zero risk: lowest label is "Very low"', () => {
-    const labels = Array.from({ length: 60 }, (_, i) => pregnancyRisk(addDays('2026-10-24', i), regular)!.label);
-    expect(labels).not.toContain('Safe');
-    expect(labels).toContain('Very low');
+  it('gives dates only, never a likelihood or a safety claim', () => {
+    const labels = Array.from({ length: 60 }, (_, i) => fertileStatus(addDays('2026-10-24', i), regular)!.label).join(' ');
+    expect(labels).not.toMatch(/safe|risk|low|high|chance/i);
   });
-  it('raises risk one level when cycles are irregular', () => {
-    const r = pregnancyRisk('2026-10-30', ['2026-10-24'])!; // little history
-    expect(r.uncertain).toBe(true);
-    expect(r.level).toBeGreaterThanOrEqual(1);
+  it('flags little history as uncertain', () => {
+    expect(fertileStatus('2026-10-30', ['2026-10-24'])!.uncertain).toBe(true);
   });
   it('returns null with no data', () => {
-    expect(pregnancyRisk('2026-11-17', [])).toBeNull();
+    expect(fertileStatus('2026-11-17', [])).toBeNull();
   });
 });
 
