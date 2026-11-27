@@ -12,6 +12,7 @@ import ShareScreen from './ShareScreen';
 import MessageIdeas from '../components/MessageIdeas';
 import DoctorSummary from '../components/DoctorSummary';
 import { lateStatus } from '../engine/late';
+import { noteSuccess } from '../reviewPrompt';
 
 
 export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { premium: boolean; onUnlock: () => void; onAddPerson: () => void; onRestart: () => void }) {
@@ -112,7 +113,7 @@ export default function Home({ premium, onUnlock, onAddPerson, onRestart }: { pr
           {MOODS.map((m) => {
             const on = logged === m.level;
             return (
-              <Pressable key={m.level} disabled={isFuture} accessibilityLabel={`Log mood ${m.name}`} onPress={() => setMood(selected, on ? null : m.level)} style={[s.moodChip, on && { backgroundColor: m.color, borderColor: m.color }, isFuture && { opacity: 0.4 }]}>
+              <Pressable key={m.level} disabled={isFuture} accessibilityLabel={`Log mood ${m.name}`} onPress={() => { setMood(selected, on ? null : m.level); if (!on) noteSuccess(4); }} style={[s.moodChip, on && { backgroundColor: m.color, borderColor: m.color }, isFuture && { opacity: 0.4 }]}>
                 <Text style={[s.moodTxt, on && { color: '#fff' }]} numberOfLines={1}>{m.short}</Text>
               </Pressable>
             );
