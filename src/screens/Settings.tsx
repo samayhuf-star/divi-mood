@@ -4,6 +4,7 @@ import { C } from '../theme';
 import { useStore } from '../store';
 import { useSoundSetting } from '../sound';
 import { useAlertSetting } from '../notifications';
+import { usePushConsent } from '../push';
 import { makeCode } from '../shareCode';
 import { startsFromFlows } from '../store';
 import { openCustomerCenter } from '../purchases';
@@ -16,6 +17,7 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
   const [docOpen, setDocOpen] = useState(false);
   const [soundOn, setSoundOn] = useSoundSetting();
   const [alertsOn, setAlertsOn] = useAlertSetting();
+  const [tipsOn, setTipsOn] = usePushConsent();
 
   const shareCycle = () => {
     const starts = startsFromFlows(flows);
@@ -100,6 +102,13 @@ export default function Settings({ premium, onUnlock, onRestore, onRestart }: { 
           </Pressable>
         </View>
         <Text style={s.small}>A daily notification at 2 pm with the expected mood, plus an evening heads-up before low-mood days, for everyone you track. Turn off any time.</Text>
+        <View style={s.row}>
+          <Text style={s.lbl}>Tips and news (push)</Text>
+          <Pressable onPress={() => setTipsOn(!tipsOn)} style={[s.b, { width: 70, borderRadius: 17 }, tipsOn && { backgroundColor: C.pink }]}>
+            <Text style={{ fontWeight: '800', color: tipsOn ? '#fff' : C.pink }}>{tipsOn ? 'On' : 'Off'}</Text>
+          </Pressable>
+        </View>
+        <Text style={s.small}>Occasional tips and feature news via OneSignal. Nothing is sent or collected unless this is on. No cycle data is shared.</Text>
       </View>
 
       <View style={s.card}>

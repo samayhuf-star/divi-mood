@@ -4,6 +4,11 @@ import Penguin from '../components/Penguin';
 import PersonForm from '../components/PersonForm';
 import { C } from '../theme';
 import { useStore, type Mode, type NewPerson } from '../store';
+import { useAlertSetting } from '../notifications';
+import { usePushConsent } from '../push';
+
+/** Read by the autopilot panel: 6 intro slides + who + setup + notifications + what you get. */
+export const ONBOARDING_SCREENS = 10;
 
 const Btn = ({ label, onPress, ghost }: { label: string; onPress: () => void; ghost?: boolean }) => (
   <Pressable onPress={onPress} style={[s.btn, ghost && s.ghost]} accessibilityRole="button">
@@ -11,10 +16,19 @@ const Btn = ({ label, onPress, ghost }: { label: string; onPress: () => void; gh
   </Pressable>
 );
 
+const Toggle = ({ title, sub, on, set }: { title: string; sub: string; on: boolean; set: (v: boolean) => void }) => (
+  <Pressable style={[s.big, on && s.bigOn]} onPress={() => set(!on)} accessibilityRole="switch" accessibilityState={{ checked: on }}>
+    <Text style={s.bigTitle}>{on ? '✓ ' : ''}{title}</Text>
+    <Text style={s.bigSub}>{sub}</Text>
+  </Pressable>
+);
+
 const SLIDES: { level: 1 | 2 | 3 | 4 | 5 | 6; title: string; body: string; size?: number }[] = [
   { level: 5, title: 'Meet Divi', body: 'A cute penguin that shows how her mood is today, so you know what to expect before you walk in the door.' },
   { level: 6, title: 'Six moods, one penguin', body: 'From Feeling Spicy to Bring Chocolate Now. Divi dances, wiggles and changes face with every mood.' },
   { level: 1, title: 'Never get caught off guard', body: 'Get a friendly heads-up the evening before a tough day, and a 7-day mood forecast with simple tips.' },
+  { level: 3, title: 'Log in two taps', body: 'Tap a mood, mark a period day. Divi learns the real pattern and the forecast gets better every week.' },
+  { level: 2, title: 'Mood at a glance', body: 'Add the Divi widget to your Home or Lock Screen and see today\'s mood without opening the app.' },
   { level: 4, title: 'Share it, privately', body: 'Send a fun Divi mood card to friends. Your data stays on your phone: no account, no server.' },
 ];
 
@@ -23,6 +37,8 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
   const [step, setStep] = useState(0);
   const [mode, setMode] = useState<Mode>('self');
   const [person, setPerson] = useState<NewPerson | null>(null);
+  const [alertsOn, setAlertsOn] = useAlertSetting();
+  const [tipsOn, setTipsOn] = usePushConsent();
 
   const finish = (premium: boolean) => {
     if (!person) return;
@@ -31,7 +47,7 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
     onDone(premium);
   };
 
-  // Steps 0-3: intro slides. Step 4: who is this for. Step 5: name + cycle questions. Step 6: what you get.
+  // Steps 0-5: intro slides. 6: who is this for. 7: name + cycle questions. 8: notifications. 9: what you get.
   if (step < SLIDES.length) {
     const sl = SLIDES[step];
     return (
@@ -76,6 +92,21 @@ export default function Onboarding({ onDone }: { onDone: (wantsPremium: boolean)
         <Text style={s.h1}>{mode === 'partner' ? 'A few quick questions' : 'Set up your cycle'}</Text>
         <Text style={[s.body, { marginBottom: 0 }]}>Rough answers are fine. The penguin gets smarter as you log real moods.</Text>
         <PersonForm key={mode} mode={mode} submitLabel="Continue" onSubmit={(p) => { setPerson(p); setStep(SLIDES.length + 2); }} />
+      </View>
+    );
+  }
+
+  if (step === SLIDES.length + 2) {
+    return (
+      <View style={s.page}>
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <Penguin level={1} size={160} />
+          <Text style={s.h1}>Stay in the loop</Text>
+          <Text style={s.body}>Choose what Divi may send you. Change it any time in Settings.</Text>
+          <Toggle title="Daily mood alerts" sub="2 pm mood update and an evening heads-up before tough days. Made on your phone." on={alertsOn} set={setAlertsOn} />
+          <Toggle title="Tips and news" sub="Occasional cycle tips and new Divi features, sent by push. Off unless you turn it on." on={tipsOn} set={setTipsOn} />
+        </View>
+        <Btn label="Continue" onPress={() => setStep(SLIDES.length + 3)} />
       </View>
     );
   }

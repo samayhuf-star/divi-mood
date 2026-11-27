@@ -2,7 +2,7 @@
   "expo": {
     "name": "Divi Mood",
     "slug": "wifey-mood",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -10,7 +10,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.samay.wifeymood",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       },
       "privacyManifests": {
         "NSPrivacyTracking": false,
@@ -29,6 +32,9 @@
             ]
           }
         ]
+      },
+      "entitlements": {
+        "aps-environment": "production"
       }
     },
     "android": {
@@ -81,6 +87,13 @@
               }
             }
           ]
+        }
+      ],
+      [
+        "onesignal-expo-plugin",
+        {
+          "mode": "production",
+          "disableLocation": true
         }
       ]
     ],

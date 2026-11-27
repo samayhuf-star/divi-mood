@@ -15,6 +15,7 @@ import { cycleInfoFor, expectedMood, todayStr, type MoodLevel } from './src/engi
 import { parseCode } from './src/shareCode';
 import { syncWidget } from './src/widgetSync';
 import { startsFromFlows } from './src/store';
+import { initPush } from './src/push';
 import { getSlots, initPurchases, isPremium, onEntitlementChange, restorePurchases, setPurchaseAttributes, showPaywall } from './src/purchases';
 
 type Tab = 'home' | 'insights' | 'settings';
@@ -38,6 +39,7 @@ function Root() {
 
   useEffect(() => {
     initPurchases();
+    initPush();
     if (Platform.OS !== 'web') { isPremium().then(setPremium); getSlots().then(setSlots); }
     return onEntitlementChange((p, n) => { setPremium(p); setSlots(n); });
   }, []);

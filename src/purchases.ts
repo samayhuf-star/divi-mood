@@ -3,7 +3,8 @@ import Purchases from 'react-native-purchases';
 
 // RevenueCat: SDK + RevenueCat's own paywall (react-native-purchases-ui).
 // Set EXPO_PUBLIC_RC_IOS_KEY (public SDK key from the RevenueCat dashboard) and create an entitlement
-// called "premium". Plans: $2.99/week, $4.99/month, $29.99/year (7-day free trial on each). See PRICING.md.
+// called "premium". Plans: $2.99/week, $4.99/month, $29.99/year (7-day free trial on each) and $39.99 lifetime
+// (non-consumable divi_plus_lifetime, package $rc_lifetime in offering "default"). See PRICING.md.
 export const ENTITLEMENT = 'premium';
 const IOS_KEY = process.env.EXPO_PUBLIC_RC_IOS_KEY ?? '';
 
