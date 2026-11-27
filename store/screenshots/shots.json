@@ -1,0 +1,83 @@
+{
+ "out": "/home/dev/ios-publish/work/divi-mood/store/screenshots",
+ "prefix": "divi",
+ "bg": [
+  "#27b3b4",
+  "#0b5f66"
+ ],
+ "accent": "#FFE08A",
+ "shots": [
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/f-card.png",
+   "cap": [
+    "Know her mood",
+    "before you walk in"
+   ],
+   "sub": "Divi the penguin shows today’s mood"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/f-home.png",
+   "cap": [
+    "Cycle calendar",
+    "+ daily mood"
+   ],
+   "sub": "Period, fertile window and PMS days"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/f-ins.png",
+   "cap": [
+    "7-day mood",
+    "forecast"
+   ],
+   "sub": "With a simple tip for each day"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/d-s2.png",
+   "cap": [
+    "Six moods,",
+    "one penguin"
+   ],
+   "sub": "From Feeling Spicy to Bring Chocolate"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/d-s3.png",
+   "cap": [
+    "Never get caught",
+    "off guard"
+   ],
+   "sub": "An evening heads-up before tough days"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/d-s4.png",
+   "cap": [
+    "Log it in",
+    "two taps"
+   ],
+   "sub": "The forecast learns the real pattern"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/d-s5.png",
+   "cap": [
+    "Today’s mood on",
+    "your Home Screen"
+   ],
+   "sub": "Home and Lock Screen widgets"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/d-s6.png",
+   "cap": [
+    "Share it,",
+    "privately"
+   ],
+   "sub": "No account, no server"
+  },
+  {
+   "src": "/tmp/claude-1000/-home-dev/b45e0c0f-e0ad-4202-ae52-613bca09bb6e/scratchpad/dv/d-s8.png",
+   "cap": [
+    "Set up in",
+    "one minute"
+   ],
+   "sub": "Rough answers are fine"
+  }
+ ]
+}
