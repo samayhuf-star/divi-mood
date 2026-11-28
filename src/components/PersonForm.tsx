@@ -56,6 +56,7 @@ export default function PersonForm({ mode, submitLabel, onSubmit, initialName }:
   const [name, setName] = useState(initialName ?? NAMES[mode][0]);
   const [cycle, setCycle] = useState(28);
   const [period, setPeriod] = useState(3);
+  const [dateErr, setDateErr] = useState('');
   const [lastDate, setLastDate] = useState<DateStr>(() => addDays(todayStr(), -10));
   const [month, setMonth] = useState<DateStr>(() => addDays(todayStr(), -10));
   const [dont, setDont] = useState(false);
@@ -74,12 +75,13 @@ export default function PersonForm({ mode, submitLabel, onSubmit, initialName }:
         <View style={s.card}>
           <Text style={s.q}>{partner ? '1. When did her last period start?' : '1. When did your last period start?'}</Text>
           <Text style={s.sub}>{dont ? 'Skipped' : `Selected: ${parse(lastDate).toDateString().slice(0, 10)} (${diffDays(todayStr(), lastDate)} days ago)`}</Text>
+          {!!dateErr && <Text accessibilityRole="alert" style={{ color: '#E5484D', fontWeight: '700', marginTop: 8 }}>{dateErr}</Text>}
           <View style={[{ marginTop: 12, marginBottom: 12 }, dont ? { opacity: 0.35 } : undefined]} pointerEvents={dont ? 'none' : 'auto'}>
             <Calendar
               month={month}
               onMonth={setMonth}
               selected={lastDate}
-              onSelect={(d) => { if (d <= todayStr()) { setDont(false); setLastDate(d); } }}
+              onSelect={(d) => { if (d <= todayStr()) { setDont(false); setDateErr(''); setLastDate(d); } else setDateErr('That date is in the future. Pick today or an earlier day.'); }}
               starts={[]}
               flows={{ [lastDate]: 'medium' }}
               moods={{}}
